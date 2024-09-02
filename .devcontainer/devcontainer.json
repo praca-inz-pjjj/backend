@@ -4,7 +4,7 @@
 	"name": "Python 3 & PostgreSQL",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
-	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"workspaceFolder": "/workspaces",
 	"features": {
 		"ghcr.io/devcontainers-contrib/features/node-asdf:0": {}
 	},
