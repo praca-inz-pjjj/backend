@@ -8,5 +8,6 @@ urlpatterns = [
     path("token/refresh", TokenRefreshView.as_view(), name="token_refresh"),
     path("class/<int:id>", views.class_data),
     path('class/create', views.create_classroom, name='create_classroom'),
-    path('class/<int:id>/create', views.create_child, name='create_child')
+    path('class/<int:id>/create', views.create_child, name='create_child'),
+    path('child/<int:id>', views.parents_of_child)
 ]

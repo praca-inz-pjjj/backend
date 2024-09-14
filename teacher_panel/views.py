@@ -9,6 +9,9 @@ from backbone.models import CustomUser
 from .serializers import ClassroomSerializer, ChildrenSerializer
 from .models import *
 from backbone.permisions import IsTeacher
+from parent_panel.models import UserChildren
+from backbone.serializers import CustomUserSerializer
+from parent_panel.serializers import UserChildrenSerializer
 
 #TODO przy logowaniu updateować last_login from django.contrib.auth.models import update_last_login
 
@@ -31,16 +34,6 @@ def teacher_data(request):
 @api_view(['GET'])
 @permission_classes([IsTeacher])
 def class_data(request, id):
-    # obj = Children(1, 'jan', 'augustyn', 1)
-    # obj.save()
-    # obj = Children(2, 'jakub', 'bizan', 1)
-    # obj.save()
-    # obj = Children(3, 'jan', 'bizan', 2)
-    # obj.save()
-    # obj = Children(4, 'paweł', 'wolanin', 2)
-    # obj.save()
-    # obj = Children(5, 'ja', 'kroczek', 1)
-    # obj.save()
     children = dict()
     objects = Children.objects.filter(classroom_id=id)
     for obj in objects:
@@ -86,3 +79,32 @@ def create_child(request, id):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'DELETE', 'POST'])
+@permission_classes([IsTeacher])
+def parents_of_child(request, id):
+    if request.method == 'GET':
+        parents = CustomUser.objects.filter(parent_perm = 2)
+        parents_of_the_child = CustomUser.objects.filter(userchildren__child_id = id)
+        serializer_potc = CustomUserSerializer(parents_of_the_child, many = True)
+        serializer_p = CustomUserSerializer(parents, many = True)
+        return Response({'parents': serializer_potc.data,
+                         'all_parents': serializer_p.data})
+    if request.method == 'DELETE':
+        try:
+            id_parent = request.data.get('id')
+            item = UserChildren.objects.get(child = id, user = id_parent)
+            item.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'POST':
+        try:
+            id_parent = request.data.get('id')
+            serializer = UserChildrenSerializer(data = {'child': id, 'user': id_parent})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
