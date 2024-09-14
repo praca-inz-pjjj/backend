@@ -21,7 +21,7 @@ name: Azure
 
 env:
   AZURE_WEBAPP_NAME: 'Bizapp'  # set this to the name of your Azure Web App
-  PYTHON_VERSION: '3.11'              # set this to the Python version to use
+  PYTHON_VERSION: '3.11'       # set this to the Python version to use
 
 on:
   push:
@@ -36,31 +36,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the latest code
       - uses: actions/checkout@v4
 
+      # Step 2: Set up the required Python version
       - name: Set up Python version
-        uses: actions/setup-python@v3.0.0
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          cache: 'pip'
+      
+      # Step 3: Cache pip dependencies
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-      - name: Create and start virtual environment
+      # Step 4: Create and activate virtual environment
+      - name: Install dependencies
         run: |
           python -m venv venv
           source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+      
+      # Optional: Step to run tests (PyTest, Django test suites, etc.)
+      # - name: Run tests
+      #   run: |
+      #     source venv/bin/activate
+      #     python manage.py test
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-
+      # Step 5: Upload the artifact for the deployment job
       - name: Upload artifact for deployment jobs
         uses: actions/upload-artifact@v3
         with:
           name: python-app
           path: |
             .
-            # !venv/
+          # No need to include the venv/ directory as it's local
 
   deploy:
     permissions:
@@ -72,15 +87,24 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
+      # Step 1: Download artifact from the build job
       - name: Download artifact from build job
         uses: actions/download-artifact@v3
         with:
           name: python-app
           path: .
 
+      # Step 2: Deploy to Azure Web App
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+      # Optional: Step to run database migrations (Django-specific)
+      - name: Run database migrations
+        run: |
+          source venv/bin/activate
+          python manage.py migrate
+
