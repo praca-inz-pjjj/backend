@@ -1,13 +1,18 @@
 name: Test
 
-env:
-  name: Test
-
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+
+env:
+  DEBUG: 1
+  USE_AZURE_POSTGRES: 0
+  SECRET_KEY: "8vcoox1shj#p#@kx0s*t@sp#^-ij09z)rn++e&zoj_6l+@&f2%"
+  ALLOWED_HOSTS: "localhost 127.0.0.1 [::1]"
+  CSRF_TRUSTED_ORIGINS: "https://localhost https://127.0.0.1"
+  SECURE_SSL_REDIRECT: 0
 
 jobs:
   build:
