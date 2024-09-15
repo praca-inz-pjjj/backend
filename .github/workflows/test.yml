@@ -1,7 +1,7 @@
-name: Test
-
 env:
-  name: Test
+  NAME: Test
+
+name: Test
 
 on:
   push:
