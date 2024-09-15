@@ -1,5 +1,8 @@
 name: Test
 
+env:
+  name: Test
+
 on:
   push:
     branches: [ "main" ]
