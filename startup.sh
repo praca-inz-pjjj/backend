@@ -8,5 +8,8 @@ python manage.py migrate
 echo "[2] Collect static files"
 python manage.py collectstatic
 
-echo "[3] Run server"
-gunicorn --bind=0.0.0.0 --timeout 600 backend.wsgi
+echo "[3] Make 'log' directory"
+mkdir log
+
+echo "[4] Run server"
+gunicorn backend.wsgi -c ./gunicorn/config.py

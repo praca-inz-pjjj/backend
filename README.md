@@ -10,19 +10,19 @@ This is a Django project that provides a REST API for a simple inżynierka proje
 5. Copy [.env.example](./.env-example) to [.env](./.env) in the root directory and fill it with required data:
 
     ```sh
-    (venv)$ cp .env.example .env
+    cp .env.example .env
     ```
 
 6. Apply the migrations:
 
     ```sh
-    (venv)$ python manage.py migrate
+    python manage.py migrate
     ```
 
 7. Run the server:
 
     ```sh
-    (venv)$ python manage.py runserver
+    python manage.py runserver
     ```
     
 8. Navigate to [http://localhost:8000/](http://localhost:8000/) in your favorite web browser.
