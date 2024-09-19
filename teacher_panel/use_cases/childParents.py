@@ -10,16 +10,19 @@ from rest_framework import status
 
 
 def get_child_parents(request, id):
-    child = Children.objects.get(id=id)
-    allParents = CustomUser.objects.filter(parent_perm = 2)
-    childParents = CustomUser.objects.filter(userchildren__child_id = id)
+    try:
+        child = Children.objects.get(id=id)
+        allParents = CustomUser.objects.filter(parent_perm = 2)
+        childParents = CustomUser.objects.filter(userchildren__child_id = id)
 
-    childSerializer = ChildrenSerializer(child)
-    childParentsSerializer = CustomUserSerializer(childParents, many = True)
-    parentsSerializer = CustomUserSerializer(allParents, many = True)
-    return Response({'parents': childParentsSerializer.data,
-                        'all_parents': parentsSerializer.data,
-                        'child': childSerializer.data})
+        childSerializer = ChildrenSerializer(child)
+        childParentsSerializer = CustomUserSerializer(childParents, many = True)
+        parentsSerializer = CustomUserSerializer(allParents, many = True)
+        return Response({'parents': childParentsSerializer.data,
+                            'all_parents': parentsSerializer.data,
+                            'child': childSerializer.data})
+    except:
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def delete_child_parents(request, id):
     try:
