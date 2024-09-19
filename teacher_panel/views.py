@@ -9,7 +9,6 @@ from backbone.models import CustomUser
 from .serializers import ClassroomSerializer, ChildrenSerializer
 from .models import *
 from backbone.permisions import IsTeacher
-
 #TODO przy logowaniu updateować last_login from django.contrib.auth.models import update_last_login
 
     
@@ -31,16 +30,6 @@ def teacher_data(request):
 @api_view(['GET'])
 @permission_classes([IsTeacher])
 def class_data(request, id):
-    # obj = Children(1, 'jan', 'augustyn', 1)
-    # obj.save()
-    # obj = Children(2, 'jakub', 'bizan', 1)
-    # obj.save()
-    # obj = Children(3, 'jan', 'bizan', 2)
-    # obj.save()
-    # obj = Children(4, 'paweł', 'wolanin', 2)
-    # obj.save()
-    # obj = Children(5, 'ja', 'kroczek', 1)
-    # obj.save()
     children = dict()
     objects = Children.objects.filter(classroom_id=id)
     for obj in objects:
