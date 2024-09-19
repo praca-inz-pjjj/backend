@@ -9,7 +9,6 @@ from backbone.models import CustomUser
 from .serializers import ClassroomSerializer, ChildrenSerializer
 from .models import *
 from backbone.permisions import IsTeacher
-from teacher_panel.use_cases.childParents import delete_child_parents, get_child_parents, post_child_parents
 #TODO przy logowaniu updateować last_login from django.contrib.auth.models import update_last_login
 
     
@@ -76,13 +75,3 @@ def create_child(request, id):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['GET', 'DELETE', 'POST'])
-@permission_classes([IsTeacher])
-def child_parents(request, id):
-    if request.method == 'GET':
-        return get_child_parents(request, id)
-    if request.method == 'DELETE':
-        return delete_child_parents(request, id)
-    if request.method == 'POST':
-        return post_child_parents(request, id)
