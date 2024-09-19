@@ -16,9 +16,9 @@ def get_child_parents(request, id):
 
     childSerializer = ChildrenSerializer(child)
     childParentsSerializer = CustomUserSerializer(childParents, many = True)
-    ParentsSerializer = CustomUserSerializer(allParents, many = True)
+    parentsSerializer = CustomUserSerializer(allParents, many = True)
     return Response({'parents': childParentsSerializer.data,
-                        'all_parents': ParentsSerializer.data,
+                        'all_parents': parentsSerializer.data,
                         'child': childSerializer.data})
 
 def delete_child_parents(request, id):
@@ -37,6 +37,6 @@ def post_child_parents(request, id):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
     except:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
