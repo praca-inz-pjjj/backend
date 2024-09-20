@@ -26,6 +26,6 @@ class AccessType(models.IntegerChoices):
 
 class PermissionState(models.TextChoices):
     SLEEP = 'SLEEP', 'Sleep'
-    ACTIVE = 'ACTIVE', 'Active'
     NOTIFY = 'NOTIFY', 'Notify'
-    USED = 'USED', 'Used'
+    ACTIVE = 'ACTIVE', 'Active'
+    CLOSED = 'CLOSED', 'Closed'
