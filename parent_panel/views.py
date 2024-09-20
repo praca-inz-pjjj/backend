@@ -1,8 +1,10 @@
 from secrets import randbelow
+from zoneinfo import ZoneInfo
 
 from django.shortcuts import render
 from django.http import HttpRequest
 from django.utils import timezone
+from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -26,16 +28,21 @@ def send_some_data(request: HttpRequest):
 
 # Get all Permissions of the Receiver
 @api_view(['GET'])
-# @permission_classes([IsReceiver])
+@permission_classes([IsReceiver])
 def get_permissions(request):
-    user = CustomUser.objects.get(id=1)
+    user = CustomUser.objects.get(id=request.user.id)
     permissions = dict()
     objects = Permission.objects.filter(permitteduser__user=user)
     for obj in objects:
-        if obj.state != PermissionState.USED:
-            permissions[obj.id] = {"parent": obj.parent.get_full_name(), "state": obj.state, 
-                                   "start_date": obj.start_date.strftime("%Y-%m-%d %H:%M"),
-                                   "end_date": obj.end_date.strftime("%Y-%m-%d %H:%M")}
+        if (obj.end_date < timezone.now()):
+            obj.state = PermissionState.CLOSED
+            obj.save()
+        if obj.state != PermissionState.CLOSED:
+            permissions[obj.id] = {
+                "parent": obj.parent.get_full_name(), "state": obj.state,
+                "start_date": timezone.localtime(obj.start_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S"),
+                "end_date": timezone.localtime(obj.end_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S")
+                }
     return Response({
         "permissions": permissions
     })
@@ -43,25 +50,25 @@ def get_permissions(request):
 # Create QR Code for Permission of a given ID
 @api_view(['POST'])
 @permission_classes([IsReceiver])
-def generate_QR_code(request, permission_id):
+def generate_QR_code(request, id):
     if request.method == 'POST':
         receiver = CustomUser.objects.get(id=request.user.id)
-        permission = Permission.objects.get(id=permission_id)
-        permitted_user = PermittedUser.objects.get(id=permission.permitteduser)
-        if (permission.state == PermissionState.USED):
-            return Response({"data": "This permission was already used"}, status.HTTP_418_IM_A_TEAPOT)
+        permission = Permission.objects.get(id=id)
+        permitted_user = PermittedUser.objects.get(id=permission.permitteduser.id)
+        if (permission.state == PermissionState.CLOSED):
+            return Response({"data": "This permission is already closed"}, status.HTTP_418_IM_A_TEAPOT)
         if (permitted_user.user != receiver):
             return Response({"data": "You don't have access to this permission, how did you get here?"}, status.HTTP_403_FORBIDDEN)
-        if (permission.start_date > timezone.now):
+        if (permission.start_date > timezone.now()):
             return Response({"data": "Too early to generate QR Code"}, status.HTTP_412_PRECONDITION_FAILED)
-        if (permission.end_date < timezone.now):
-            permission.state = PermissionState.USED
+        if (permission.end_date < timezone.now()):
+            permission.state = PermissionState.CLOSED
             permission.save()
             return Response({"data": "This permission has expired"}, status.HTTP_412_PRECONDITION_FAILED)
         generated_qr_code = randbelow(90000000) + 10000000
-        print("Generated QR Code: " + generated_qr_code)
+        print("Generated QR Code: " + str(generated_qr_code))
         permission.qr_code = generated_qr_code
-        if (permission.state == PermissionState.SLEEP):
+        if (permission.state == PermissionState.SLEEP or permission.state == PermissionState.NOTIFY):
             permission.state = PermissionState.ACTIVE
         permission.save()
         return Response({"qr_code": generated_qr_code}, status=status.HTTP_201_CREATED)
