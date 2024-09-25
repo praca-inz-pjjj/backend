@@ -2,6 +2,10 @@
 ## Description
 This is a Django project that provides a REST API for a simple inżynierka project - Bizapp. It uses Django Rest Framework to provide the API endpoints.
 
+## Deployments
+1. Production URL: [https://bizapp-api.azurewebsites.net](https://bizapp-api.azurewebsites.net)
+2. Development URL: [https://bizapp-dev.azurewebsites.net](https://bizapp-dev.azurewebsites.net)
+
 ## How to run the project (Devcontainer)
 1. Clone the repository
 2. Open project in Visual Studio Code
