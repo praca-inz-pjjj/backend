@@ -26,23 +26,24 @@ def send_some_data(request: HttpRequest):
         "data": "Hello from parent api",
     })
 
+# TODO: Change get_permissions to return every info we need in mobile homepage for parent and receiver
 # Get all Permissions of the Receiver
 @api_view(['GET'])
 @permission_classes([IsReceiver])
 def get_permissions(request):
     user = CustomUser.objects.get(id=request.user.id)
-    permissions = dict()
+    permissions = []
     objects = Permission.objects.filter(permitteduser__user=user)
     for obj in objects:
         if (obj.end_date < timezone.now()):
             obj.state = PermissionState.CLOSED
             obj.save()
         if obj.state != PermissionState.CLOSED:
-            permissions[obj.id] = {
-                "parent": obj.parent.get_full_name(), "state": obj.state,
+            permissions.append({
+                "id": obj.id, "parent": obj.parent.get_full_name(), "state": obj.state,
                 "start_date": timezone.localtime(obj.start_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S"),
                 "end_date": timezone.localtime(obj.end_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S")
-                }
+                })
     return Response({
         "permissions": permissions
     })
