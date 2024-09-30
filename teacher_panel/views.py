@@ -68,7 +68,6 @@ def create_classroom(request):
 @api_view(['POST'])
 @permission_classes([IsTeacher])
 def create_child(request, id):
-    print('weszłem')
     if request.method == 'POST':
         serializer = ChildrenSerializer(data=request.data)
         if serializer.is_valid():
