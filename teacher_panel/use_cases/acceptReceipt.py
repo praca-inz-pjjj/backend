@@ -14,18 +14,13 @@ class AcceptReceiptView(APIView):
     def get(self, request):
         try:
             id = request.GET.get('id')
-            print(id)
             permision = Permission.objects.get(qr_code = id)
             if not permision:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-            print(permision)
             permisionSerializer = PermissionSerializer(permision)
-            print(permisionSerializer)
             if permisionSerializer['state'].value == 'ACTIVE':
                 parent = CustomUser.objects.get(id = permisionSerializer.data['parent'])
-                # permittedUser = CustomUser.objects.get()
                 parentSerializer = CustomUserSerializer(parent)
-                print('ma permisje')
                 return Response({ 'id': id, 'permission': permisionSerializer.data, 
                                  'parent': parentSerializer.data})
         except:
