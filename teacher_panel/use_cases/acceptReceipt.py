@@ -46,6 +46,7 @@ class AcceptReceiptView(APIView):
 
                     return Response({ 'id': id, 'permission': permisionSerializer.data, 
                                     'parent': parentSerializer.data, 'reciver': reciverSerializer.data, 'child': childSerializer.data})
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
