@@ -29,3 +29,4 @@ class PermissionState(models.TextChoices):
     NOTIFY = 'NOTIFY', 'Notify'
     ACTIVE = 'ACTIVE', 'Active'
     CLOSED = 'CLOSED', 'Closed'
+    PERMANENT = 'PERMANENT', 'Permanent'
