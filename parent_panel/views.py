@@ -13,6 +13,9 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from backbone.permisions import IsReceiver
 from backbone.models import CustomUser
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.exceptions import ValidationError
 
 from .models import *
 
@@ -73,3 +76,15 @@ def generate_QR_code(request, id):
             permission.state = PermissionState.ACTIVE
         permission.save()
         return Response({"qr_code": generated_qr_code}, status=status.HTTP_201_CREATED)
+
+
+class ObtainParentTokenPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        if(user.parent_perm != 2):
+            raise ValidationError('Podany użytkownik nie jest rodzicem')
+        return token
+    
+class ObtainParentTokenPairView(TokenObtainPairView):
+    serializer_class = ObtainParentTokenPairSerializer

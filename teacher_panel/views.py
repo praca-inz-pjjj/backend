@@ -9,6 +9,9 @@ from backbone.models import CustomUser
 from .serializers import ClassroomSerializer, ChildrenSerializer
 from .models import *
 from backbone.permisions import IsTeacher
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.exceptions import ValidationError
 #TODO przy logowaniu updateować last_login from django.contrib.auth.models import update_last_login
 
     
@@ -74,3 +77,16 @@ def create_child(request, id):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ObtainTeacherTokenPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        print(user.teacher_perm)
+        if(user.teacher_perm != 2):
+            raise ValidationError('Podany użytkownik nie jest nauczycielem')
+        return token
+    
+class ObtainTeacherTokenPairView(TokenObtainPairView):
+    serializer_class = ObtainTeacherTokenPairSerializer
