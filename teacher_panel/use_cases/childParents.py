@@ -35,11 +35,6 @@ class ChildParentsView(APIView):
             item.delete()
 
             permittedUser = PermittedUser.objects.get(child = id, user = id_parent, parent = id_parent)
-            # permittedUserSerializer = PermittedUserSerializer(permittedUser)
-
-            # permission = Permission.objects.get(permitteduser=permittedUserSerializer.data['id'], parent=id_parent, state = PermissionState.PERMANENT)
-            # permission.state = PermissionState.CLOSED
-            # permission.save()
             permittedUser.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except:
