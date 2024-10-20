@@ -18,12 +18,15 @@ Including another URLconf
 from django.shortcuts import redirect
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework_simplejwt.views import  TokenRefreshView
+
 from . import views
 
 urlpatterns = [
     path('', lambda req: redirect('/health')),
     path("admin/", admin.site.urls),
     path("logout/", views.LogoutView.as_view(), name="logout"),
+    path("refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("teacher/", include("teacher_panel.urls")),
     path("parent/", include("parent_panel.urls")),
 ]
