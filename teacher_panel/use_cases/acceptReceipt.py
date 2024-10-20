@@ -26,12 +26,12 @@ class AcceptReceiptView(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
         try:
             permisionSerializer = PermissionSerializer(permision)
-            if permisionSerializer['state'].value == 'ACTIVE':
+            if permisionSerializer['state'].value == 'ACTIVE' or permisionSerializer['state'].value == 'PERMANENT':
                 start_date = datetime.fromisoformat(permisionSerializer['start_date'].value)
                 end_date = datetime.fromisoformat(permisionSerializer['end_date'].value)
                 current = datetime.now(start_date.tzinfo)
                 
-                if start_date < current and end_date > current:
+                if (start_date < current and end_date > current):
                     parent = CustomUser.objects.get(id = permisionSerializer.data['parent'])
                     parentSerializer = CustomUserSerializer(parent)
                     
@@ -62,7 +62,7 @@ class AcceptReceiptView(APIView):
             permission = Permission.objects.get(id = permission_id)
             permissionSerializer = PermissionSerializer(permission)
 
-            if permissionSerializer['state'].value == 'ACTIVE':
+            if permissionSerializer['state'].value == 'ACTIVE' or permissionSerializer['state'].value == 'PERMANENT':
 
                 permittedUser = PermittedUser.objects.get(id = permissionSerializer.data['permitteduser'])
                 permittedUserSerializer = PermittedUserSerializer(permittedUser)
@@ -74,9 +74,9 @@ class AcceptReceiptView(APIView):
 
                 if historySerializer.is_valid():
                     historySerializer.save()
-
-                    permission.state = PermissionState.CLOSED
-                    permission.save()
+                    if permission.state != PermissionState.PERMANENT:
+                        permission.state = PermissionState.CLOSED
+                        permission.save()
                     return Response(status=status.HTTP_204_NO_CONTENT)
                 
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
