@@ -48,7 +48,7 @@ class PermittedUser(models.Model):
 class Permission(models.Model):
     permitteduser = models.ForeignKey(PermittedUser, on_delete=models.CASCADE)
     parent = models.ForeignKey(User, on_delete=models.CASCADE)
-    state = models.CharField(max_length=6, choices=PermissionState.choices, default=PermissionState.SLEEP)
+    state = models.CharField(max_length=11, choices=PermissionState.choices, default=PermissionState.SLEEP)
     qr_code = models.IntegerField(null=True, blank=True) #TODO validator so it accepts only 8-number integers
     two_factor_code = models.IntegerField(null=True, blank=True) #TODO validator so it accepts only 8-number integers
     start_date = models.DateTimeField(default=timezone.now)

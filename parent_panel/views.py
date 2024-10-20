@@ -38,7 +38,7 @@ def get_permissions(request):
     permissions = []
     objects = Permission.objects.filter(permitteduser__user=user)
     for obj in objects:
-        if (obj.end_date < timezone.now()):
+        if (obj.end_date < timezone.now() and obj.state != PermissionState.PERMANENT ):
             obj.state = PermissionState.CLOSED
             obj.save()
         if obj.state != PermissionState.CLOSED:
@@ -65,7 +65,7 @@ def generate_QR_code(request, id):
             return Response({"data": "You don't have access to this permission, how did you get here?"}, status.HTTP_403_FORBIDDEN)
         if (permission.start_date > timezone.now()):
             return Response({"data": "Too early to generate QR Code"}, status.HTTP_412_PRECONDITION_FAILED)
-        if (permission.end_date < timezone.now()):
+        if (permission.end_date < timezone.now() and permission.state != PermissionState.PERMANENT):
             permission.state = PermissionState.CLOSED
             permission.save()
             return Response({"data": "This permission has expired"}, status.HTTP_412_PRECONDITION_FAILED)
@@ -74,6 +74,8 @@ def generate_QR_code(request, id):
         permission.qr_code = generated_qr_code
         if (permission.state == PermissionState.SLEEP or permission.state == PermissionState.NOTIFY):
             permission.state = PermissionState.ACTIVE
+        if permission.state == PermissionState.PERMANENT:
+            permission.end_date = timezone.now() + timedelta(minutes=5)
         permission.save()
         return Response({"qr_code": generated_qr_code}, status=status.HTTP_201_CREATED)
 
