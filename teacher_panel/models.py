@@ -22,7 +22,7 @@ class UserClassroom(models.Model):
         verbose_name_plural = "Users-Classrooms" # "Klasy Nauczyciela"
 
 class Children(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50) # TODO change name to first_name and surname to last_name for it to be compatible with CustomUser model
     surname = models.CharField(max_length=50)
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
     birth_date = models.DateField(max_length=8)
@@ -33,3 +33,10 @@ class Children(models.Model):
         ]
         verbose_name = "Child" # "Dziecko"
         verbose_name_plural = "Children" # "Dzieci"
+
+    def get_full_name(self):
+        """
+        Return the first_name plus the last_name, with a space in between.
+        """
+        full_name = "%s %s" % (self.name, self.surname)
+        return full_name.strip()
