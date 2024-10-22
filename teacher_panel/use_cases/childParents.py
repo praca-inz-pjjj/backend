@@ -4,7 +4,7 @@ from backbone.permisions import IsTeacher
 from backbone.serializers import CustomUserSerializer, PermittedUserSerializer
 from backbone.types import PermissionState
 from parent_panel.models import Permission, PermittedUser, UserChildren
-from parent_panel.serializers import PartialUserChildrenSerializer, PermissionSerializer
+from parent_panel.serializers import UserChildrenSerializer, PermissionSerializer
 from teacher_panel.models import Children
 from teacher_panel.serializers import ChildrenSerializer
 from rest_framework.response import Response
@@ -43,7 +43,7 @@ class ChildParentsView(APIView):
     def post(self, request, id):
         try:
             id_parent = request.data.get('id')
-            serializer = PartialUserChildrenSerializer(data = {'child': id, 'user': id_parent})
+            serializer = UserChildrenSerializer(data = {'child': id, 'user': id_parent})
             if serializer.is_valid():
                 serializer.save()
                 permittedUserSerializer = PermittedUserSerializer(data = {'child': id, 'parent': id_parent, 'user': id_parent})

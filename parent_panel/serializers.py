@@ -1,6 +1,6 @@
 from rest_framework_simplejwt.serializers import serializers
 from .models import History, Permission, UserChildren
-class PartialUserChildrenSerializer(serializers.ModelSerializer):
+class UserChildrenSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserChildren
         fields = '__all__'
