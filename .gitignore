@@ -256,4 +256,7 @@ modules.xml
 # Sonarlint plugin
 .idea/sonarlint
 
+# Stubs
+typings/
+
 # End of https://www.toptal.com/developers/gitignore/api/pycharm+all,django

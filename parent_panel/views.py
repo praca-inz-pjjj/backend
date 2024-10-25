@@ -21,23 +21,6 @@ from .serializers import PermissionSerializer
 
 from .models import *
 
-# Create your views here.
-
-@api_view(['GET'])
-@permission_classes([IsParent])
-def parent_data(request):
-    children = dict()
-    user_children = UserChildren.objects.filter(user_id=request.user.id)
-    for index, child_obj in enumerate(user_children):
-         child = Children.objects.get(id=child_obj.child_id)
-         children[index + 1] = {'id': child.id, 'name': child.name, 'surname': child.surname}
-    parent = CustomUser.objects.get(id=request.user.id)
-    name = parent.get_full_name()
-    return Response({
-        "name": name,
-        "children": children
-    })
-
 # TODO: Change get_permissions to return every info we need in mobile homepage for parent and receiver
 # Get all Permissions of the Receiver
 @api_view(['GET'])
@@ -87,43 +70,6 @@ def generate_QR_code(request, id):
             permission.end_date = timezone.now() + timedelta(minutes=5)
         permission.save()
         return Response({"qr_code": generated_qr_code}, status=status.HTTP_201_CREATED)
-
-@api_view(['GET'])
-@permission_classes([IsParent])
-def get_child_details(request, id):
-    if request.method == 'GET':
-        parent = CustomUser.objects.get(id=request.user.id)
-        child = Children.objects.get(id=id)
-        is_connection = UserChildren.objects.filter(user=parent, child=child).exists()
-        if not is_connection:
-            return Response({"data": "You don't have access to this child, how did you get here?"}, status.HTTP_403_FORBIDDEN)
-        permitted_users = PermittedUser.objects.filter(child=child)
-        permitted_users_data = dict()
-        permissions_data = dict()
-        for index, permitted_user in enumerate(permitted_users):
-            permitted_users_data[index + 1] = {"id" : permitted_user.id,
-                                       "user" : permitted_user.user.get_full_name(), 
-                                       "parent" : permitted_user.parent.get_full_name(),
-                                       "date" : timezone.localtime(permitted_user.date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d"),
-                                       "signature" : permitted_user.signature_delivered,
-                                       "is_parent" : UserChildren.objects.filter(user=permitted_user.user, child=child).exists()
-                                       }
-
-            permissions = Permission.objects.filter(permitteduser=permitted_user)
-            for index_2, permission in enumerate(permissions):
-                permissions_data[index_2 + 1] = {
-                    "id" : permission.id,
-                    "user" : permission.permitteduser.user.get_full_name(),
-                    "state" : permission.state,
-                    "start_date": timezone.localtime(permission.start_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S"),
-                    "end_date": timezone.localtime(permission.end_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S")
-                    }
-
-        return Response ({
-            "name" : child.get_full_name(),
-            "permitted_users" : permitted_users_data,
-            "permissions" : permissions_data
-        })
 
 @api_view(['POST'])
 @permission_classes([IsParent])
