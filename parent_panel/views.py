@@ -83,13 +83,36 @@ def create_permission(request):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['POST'])
+@permission_classes([IsParent])
+def change_password(request):
+    if request.method == 'POST':
+        print(request.user.id)
+        print(request.data['userId'], request.data['password'])
+        try:
+            user = CustomUser.objects.get(id=request.user.id)
+            user.set_password(request.data['password'])
+            user.temp_password = None
+            user.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class ObtainParentTokenPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
         if(user.parent_perm != 2):
             raise ValidationError('Podany użytkownik nie jest rodzicem')
+        token['temp_password'] = user.temp_password
         return token
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        # Dodajemy informację do odpowiedzi, jeśli użytkownik ma tymczasowe hasło
+        data['temp_password'] = self.user.temp_password
+        
+        return data
     
 class ObtainParentTokenPairView(TokenObtainPairView):
     serializer_class = ObtainParentTokenPairSerializer
