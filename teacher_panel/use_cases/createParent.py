@@ -26,7 +26,8 @@ class CreateParent(APIView):
                 is_superuser=False,
                 is_active=True,
                 teacher_perm = 0,
-                parent_perm = 2)
+                parent_perm = 2,
+                temp_password=password)
             user.set_password(password)
             user.save()
             return Response({

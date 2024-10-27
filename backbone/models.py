@@ -21,6 +21,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     teacher_perm = models.PositiveSmallIntegerField(choices=types.AccessType.choices, default=types.AccessType.NONE)
     parent_perm = models.PositiveSmallIntegerField(choices=types.AccessType.choices, default=types.AccessType.NONE)
+    temp_password = models.CharField(max_length=150, null=True)
 
     objects = manager.UserManager()
 
