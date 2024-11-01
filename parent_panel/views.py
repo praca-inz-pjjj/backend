@@ -71,6 +71,26 @@ def generate_QR_code(request, id):
         permission.save()
         return Response({"qr_code": generated_qr_code}, status=status.HTTP_201_CREATED)
 
+@api_view(['GET'])
+@permission_classes([IsParent])
+def get_permitted_users_for_child(request, id):
+    if request.method == 'GET':
+        parent = CustomUser.objects.get(id=request.user.id)
+        child = Children.objects.get(id=id)
+        is_connection = UserChildren.objects.filter(user=parent, child=child).exists()
+        if not is_connection:
+            return Response({"data": "You don't have access to this child, how did you get here?"}, status.HTTP_403_FORBIDDEN)
+        permitted_users = PermittedUser.objects.filter(child=child)
+        permitted_users_data = dict()
+        for index, permitted_user in enumerate(permitted_users):
+            permitted_users_data[index + 1] = {"id" : permitted_user.id,
+                                               "user" : permitted_user.user.get_full_name(), 
+                                               "is_parent" : UserChildren.objects.filter(user=permitted_user.user, child=child).exists()
+                                       }
+        return Response({
+            "permitted_users" : permitted_users_data
+        })
+
 @api_view(['POST'])
 @permission_classes([IsParent])
 def create_permission(request):
