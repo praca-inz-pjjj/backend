@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from parent_panel.models import UserChildren
-from teacher_panel.models import Children
+from teacher_panel.models import Children, UserClassroom
 from csv import writer
 
 
@@ -20,6 +20,10 @@ class DownloadParentList(APIView):
             class_id = id
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            UserClassroom.objects.get(classroom = class_id, user = request.user.id)
+        except:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
             children_ids = Children.objects.filter(classroom = class_id).values_list('id', flat=True)
             user_ids = UserChildren.objects.filter(child__in = children_ids).values_list('user', flat=True).distinct()
