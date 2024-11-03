@@ -21,7 +21,7 @@ def get_child_details(request: Request, child_id: int):
     child = get_object_or_404(Children, id=child_id)
     
     if not ChildValidator.is_parent_of_child(parent, child):
-            return Response({"detail": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
+            return Response({"message": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
 
     permitted_users_data = []
     permitted_users = PermittedUser.objects.filter(child=child)
