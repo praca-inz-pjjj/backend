@@ -8,7 +8,7 @@ from backbone.models import CustomUser
 from parent_panel.other_views.commons import NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE, USER_ALREADY_PERMITTED_MESSAGE
 from .validators.child_validator import ChildValidator
 from ..serializers import PermittedUserSerializer
-from ..models import Children, PermittedUser
+from ..models import Child, PermittedUser
 
 
 
@@ -18,7 +18,7 @@ class ChildReceiversView(APIView):
     # get all child's permitted users (parents included)
     def get(self, request: Request, child_id: int):
         parent: CustomUser = request.user
-        child: Children = get_object_or_404(Children, id=child_id)
+        child: Child = get_object_or_404(Child, id=child_id)
 
         if not ChildValidator.is_parent_of_child(parent, child):
             return Response({"detail": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
@@ -35,7 +35,7 @@ class ChildReceiversView(APIView):
         except:
             Response(status=status.HTTP_400_BAD_REQUEST)
 
-        child: Children = get_object_or_404(Children, id=child_id)
+        child: Child = get_object_or_404(Child, id=child_id)
         permitted_user = get_object_or_404(CustomUser, id=permitted_user_id)
 
         if not ChildValidator.is_parent_of_child(parent, child):
@@ -56,7 +56,7 @@ class ChildReceiversView(APIView):
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
-        child: Children = get_object_or_404(Children, id=child_id)
+        child: Child = get_object_or_404(Child, id=child_id)
         permitted_user = get_object_or_404(CustomUser, id=permitted_user_id)
 
         if not ChildValidator.is_parent_of_child(parent, child):

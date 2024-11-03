@@ -34,9 +34,9 @@ def teacher_data(request):
 @permission_classes([IsTeacher])
 def class_data(request, id):
     children = dict()
-    objects = Children.objects.filter(classroom_id=id)
+    objects = Child.objects.filter(classroom_id=id)
     for obj in objects:
-        children[obj.id] = {'name': obj.name, 'surname': obj.surname}
+        children[obj.id] = {'name': obj.first_name, 'surname': obj.last_name}
     classroom = Classroom.objects.get(id=id)
     return Response({
         "id": id,

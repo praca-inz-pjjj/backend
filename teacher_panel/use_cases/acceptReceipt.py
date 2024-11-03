@@ -12,7 +12,7 @@ from parent_panel.serializers import HistorySerializer, PermissionSerializer
 from datetime import datetime
 from django.utils import timezone
 
-from teacher_panel.models import Children
+from teacher_panel.models import Child
 from teacher_panel.serializers import ChildrenSerializer
 
 
@@ -38,7 +38,7 @@ class AcceptReceiptView(APIView):
                     permittedUser = PermittedUser.objects.get(id = permisionSerializer.data['permitteduser'])
                     permittedUserSerializer = PermittedUserSerializer(permittedUser)
 
-                    child = Children.objects.get(id = permittedUserSerializer.data['child'])
+                    child = Child.objects.get(id = permittedUserSerializer.data['child'])
                     childSerializer = ChildrenSerializer(child)
 
                     reciver = CustomUser.objects.get(id = permittedUserSerializer.data['user'])
