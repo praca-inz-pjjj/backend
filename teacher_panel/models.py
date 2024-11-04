@@ -1,7 +1,7 @@
 from django.db import models
 from backbone.models import CustomUser as User
 
-# models: Classroom UserClassroom Children
+# models: Classroom UserClassroom Child
 
 class Classroom(models.Model):
     name = models.CharField(unique=True, max_length=100)

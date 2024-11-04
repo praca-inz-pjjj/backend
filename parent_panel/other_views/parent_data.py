@@ -17,16 +17,16 @@ class ParentDataView(APIView):
 
     def get(self, request: Request):
         # Fetch all children IDs associated with the authenticated parent
-        user_children_ids = UserChild.objects.filter(user_id=request.user.id).values_list('child_id', flat=True)
+        user_child_ids = UserChild.objects.filter(user_id=request.user.id).values_list('child_id', flat=True)
         
         # Fetch children instances using these IDs
-        children = Child.objects.filter(id__in=user_children_ids)
+        children = Child.objects.filter(id__in=user_child_ids)
         
         # Serialize the children data
         children_serializer = ParentChildrenSerializer(children, many=True)
 
         # Fetch all permitted users associated with any of the parent's children
-        permitted_users = PermittedUser.objects.filter(child_id__in=user_children_ids)
+        permitted_users = PermittedUser.objects.filter(child_id__in=user_child_ids)
 
         permitted_users_data = []
         for permitted_user in permitted_users:
@@ -37,7 +37,7 @@ class ParentDataView(APIView):
                 "parent_name": permitted_user.parent.get_full_name(),
                 "date": timezone.localtime(permitted_user.date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d"),
                 "signature": permitted_user.signature_delivered,
-                "is_parent": UserChild.objects.filter(user=permitted_user.user, child_id__in=user_children_ids).exists(),
+                "is_parent": UserChild.objects.filter(user=permitted_user.user, child_id__in=user_child_ids).exists(),
             }
             permitted_users_data.append(user_data)
 

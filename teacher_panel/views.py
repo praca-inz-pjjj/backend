@@ -15,7 +15,7 @@ from rest_framework.exceptions import ValidationError
 #TODO przy logowaniu updateować last_login from django.contrib.auth.models import update_last_login
 
     
-# Teacher home page data - name and surname of teacher, classes he is teaching
+# Teacher home page data - first_name and last_name of teacher, classes he is teaching
 @api_view(['GET'])
 @permission_classes([IsTeacher])
 def teacher_data(request):
