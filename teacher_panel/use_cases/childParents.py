@@ -3,9 +3,9 @@ from backbone.models import CustomUser
 from backbone.permisions import IsTeacher
 from backbone.serializers import CustomUserSerializer, PermittedUserSerializer
 from backbone.types import PermissionState
-from parent_panel.models import Permission, PermittedUser, UserChildren
+from parent_panel.models import Permission, PermittedUser, UserChild
 from parent_panel.serializers import UserChildrenSerializer, PermissionSerializer
-from teacher_panel.models import Children
+from teacher_panel.models import Child
 from teacher_panel.serializers import ChildrenSerializer
 from rest_framework.response import Response
 from rest_framework import status
@@ -15,9 +15,9 @@ class ChildParentsView(APIView):
     permission_classes = [IsTeacher]
     def get(self, request, id):
         try:
-            child = Children.objects.get(id=id)
+            child = Child.objects.get(id=id)
             allParents = CustomUser.objects.filter(parent_perm = 2)
-            childParents = CustomUser.objects.filter(userchildren__child_id = id)
+            childParents = CustomUser.objects.filter(userchild__child_id = id)
 
             childSerializer = ChildrenSerializer(child)
             childParentsSerializer = CustomUserSerializer(childParents, many = True)
@@ -31,7 +31,7 @@ class ChildParentsView(APIView):
     def delete(self, request, id):
         try:
             id_parent = request.data.get('id')
-            item = UserChildren.objects.get(child = id, user = id_parent)
+            item = UserChild.objects.get(child = id, user = id_parent)
             item.delete()
 
             permittedUser = PermittedUser.objects.get(child = id, user = id_parent, parent = id_parent)
