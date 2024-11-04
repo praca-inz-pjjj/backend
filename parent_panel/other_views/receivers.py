@@ -8,7 +8,7 @@ from backbone.permisions import IsParent
 from backbone.models import CustomUser
 from .validators.child_validator import ChildValidator
 from ..serializers import PermittedUserSerializer
-from ..models import Children, PermittedUser
+from ..models import Child, PermittedUser
 
 class ReceiversView(APIView):
     permission_classes = (IsParent,)
