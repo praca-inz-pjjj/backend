@@ -17,7 +17,7 @@ class ChildParentsView(APIView):
         try:
             child = Child.objects.get(id=id)
             allParents = CustomUser.objects.filter(parent_perm = 2)
-            childParents = CustomUser.objects.filter(userchildren__child_id = id)
+            childParents = CustomUser.objects.filter(userchild__child_id = id)
 
             childSerializer = ChildrenSerializer(child)
             childParentsSerializer = CustomUserSerializer(childParents, many = True)
