@@ -13,6 +13,7 @@ urlpatterns = [
     path("generate/<int:id>", views.generate_QR_code, name="generate_QR_code"),
     path("child/<int:id>", get_child_details, name="get_child_details"),
     path("child/<int:id>/receivers", ChildReceiversView.as_view()),
-    path("child/<int:id>/permitted_users", views.get_permitted_users_for_child, name="get_permitted_users_for_child"),
+    path("child/<int:id>/permitted-users", views.get_permitted_users_for_child, name="get_permitted_users_for_child"),
+    path("child/<int:id>/create-permission", views.create_permission, name="create_permission"),
     path("change-password", views.change_password, name='change-password')
 ]

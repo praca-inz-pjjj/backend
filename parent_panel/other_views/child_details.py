@@ -16,9 +16,9 @@ from parent_panel.other_views.validators.child_validator import ChildValidator
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsParent])
-def get_child_details(request: Request, child_id: int):
+def get_child_details(request: Request, id: int):
     parent = get_object_or_404(CustomUser, id=request.user.id)
-    child = get_object_or_404(Child, id=child_id)
+    child = get_object_or_404(Child, id=id)
     
     if not ChildValidator.is_parent_of_child(parent, child):
             return Response({"detail": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
