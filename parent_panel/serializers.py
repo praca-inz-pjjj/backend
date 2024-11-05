@@ -30,3 +30,15 @@ class ParentChildrenSerializer(serializers.ModelSerializer):
     class Meta:
         model = Children
         fields = ['id', 'name', 'surname', 'classroom_name']
+
+class HistorySerializer(serializers.ModelSerializer):
+    child_name = serializers.CharField(source='child.name', read_only=True)  # Get child name
+    child_surname = serializers.CharField(source='child.surname', read_only=True)  # Get child name
+    receiver_name = serializers.CharField(source='receiver.first_name', read_only=True)  # Get receiver name
+    receiver_surname = serializers.CharField(source='receiver.last_name', read_only=True)  # Get receiver name
+    teacher_name = serializers.CharField(source='teacher.first_name', read_only=True)  # Get teacher name
+    teacher_surname = serializers.CharField(source='teacher.last_name', read_only=True)  # Get teacher name
+
+    class Meta:
+        model = History
+        fields = '__all__'
