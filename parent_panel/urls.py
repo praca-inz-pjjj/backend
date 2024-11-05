@@ -9,6 +9,7 @@ from .other_views.parent_data import ParentDataView
 from .other_views.child_details import get_child_details
 from .other_views.parent_receivers import ParentReceiversView
 from parent_panel.other_views.parent_children import ParentChildrenView
+from .other_views.receiver_signature import ReceiverSignatureView
 
 urlpatterns = [
     path("", ParentDataView.as_view()),
@@ -22,5 +23,6 @@ urlpatterns = [
     path("change-password", views.change_password, name='change-password'),
     path("receivers", ParentReceiversView.as_view(), name="get_parent_receivers"),
     path("children", ParentChildrenView.as_view(), name="get_parent_children"),
-    path("child/<int:child_id>/create-receiver", CreateReceiver.as_view(), name="create_receiver")
+    path("child/<int:child_id>/create-receiver", CreateReceiver.as_view(), name="create_receiver"),
+    path("receiver/<int:receiver_id>/signature", ReceiverSignatureView.as_view(), name="receiver_signature"),
 ]

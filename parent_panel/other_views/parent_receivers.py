@@ -28,6 +28,7 @@ class ParentReceiversView(APIView):
                 "receiver_id": receiver.id,
                 "receiver_name": receiver.user.get_full_name(),
                 "child_name": get_object_or_404(Child.objects, id=receiver.child.id).get_full_name(),
+                "child_id": get_object_or_404(Child.objects, id=receiver.child.id).id,
                 "parent_name": receiver.parent.get_full_name(),
                 "date": timezone.localtime(receiver.date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d"),
                 "signature": receiver.signature_delivered,
