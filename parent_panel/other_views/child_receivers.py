@@ -21,7 +21,7 @@ class ChildReceiversView(APIView):
         child: Child = get_object_or_404(Child, id=child_id)
 
         if not ChildValidator.is_parent_of_child(parent, child):
-            return Response({"detail": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
+            return Response({"message": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
 
         child_permitted_users = PermittedUser.objects.filter(child=child)
         serializer = PermittedUserSerializer(child_permitted_users, many=True)
@@ -39,10 +39,10 @@ class ChildReceiversView(APIView):
         permitted_user = get_object_or_404(CustomUser, id=permitted_user_id)
 
         if not ChildValidator.is_parent_of_child(parent, child):
-            return Response({"detail": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
+            return Response({"message": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
         
         if not ChildValidator.is_receiver_of_child(permitted_user, child):
-            return Response({"detail": USER_ALREADY_PERMITTED_MESSAGE}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": USER_ALREADY_PERMITTED_MESSAGE}, status=status.HTTP_400_BAD_REQUEST)
 
         permitted_user_entry = PermittedUser.objects.create(child=child, user=permitted_user)
         serializer = PermittedUserSerializer(permitted_user_entry)
@@ -60,11 +60,11 @@ class ChildReceiversView(APIView):
         permitted_user = get_object_or_404(CustomUser, id=permitted_user_id)
 
         if not ChildValidator.is_parent_of_child(parent, child):
-            return Response({"detail": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
+            return Response({"message": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
 
         permitted_user_entry = PermittedUser.objects.filter(child=child, user=permitted_user).first()
         if not permitted_user_entry:
-            return Response({"detail": "User is not permitted for this child."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"message": "User is not permitted for this child."}, status=status.HTTP_404_NOT_FOUND)
 
         permitted_user_entry.delete()
-        return Response({"detail": "User removed from permitted list successfully."}, status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "User removed from permitted list successfully."}, status=status.HTTP_204_NO_CONTENT)

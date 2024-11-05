@@ -6,24 +6,19 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from backbone.models import CustomUser
-from parent_panel.serializers import ParentChildrenSerializer
 from parent_panel.models import PermittedUser, UserChild
 from backbone.permisions import IsParent
 from teacher_panel.models import Child
 
-class ParentDataView(APIView):
-    permission_classes = (IsAuthenticated, IsParent, )
+
+class ParentReceiversView(APIView):
+    permission_classes = (IsAuthenticated, IsParent)
 
     def get(self, request: Request):
         # Fetch all children IDs associated with the authenticated parent
-        parent_children_ids = UserChild.objects.filter(user_id=request.user.id).values_list('child_id', flat=True)
-        
-        # Fetch children instances using these IDs
-        children = Child.objects.filter(id__in=parent_children_ids)
-        
-        # Serialize the children data
-        children_serializer = ParentChildrenSerializer(children, many=True)
+        parent_children_ids = UserChild.objects \
+            .filter(user_id=request.user.id) \
+            .values_list("child_id", flat=True) 
 
         # Fetch all permitted users associated with any of the parent's children
         receivers = PermittedUser.objects.filter(child_id__in=parent_children_ids)
@@ -40,12 +35,4 @@ class ParentDataView(APIView):
             } for receiver in receivers
         ]
 
-        # Get the parent's full name
-        parent = get_object_or_404(CustomUser, id=request.user.id)
-        name = parent.get_full_name()
-
-        return Response({
-            "parent_name": name,
-            "children": children_serializer.data,
-            "receivers": receivers_data,
-        })
+        return Response(receivers_data)

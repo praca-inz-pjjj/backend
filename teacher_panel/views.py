@@ -71,12 +71,11 @@ def create_classroom(request):
 @api_view(['POST'])
 @permission_classes([IsTeacher])
 def create_child(request, id):
-    if request.method == 'POST':
-        serializer = ChildrenSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer = ChildrenSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ObtainTeacherTokenPairSerializer(TokenObtainPairSerializer):
