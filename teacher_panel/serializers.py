@@ -1,7 +1,7 @@
 # from django.contrib.auth.models import User
 from backbone.models import CustomUser as User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, serializers
-from .models import Classroom, UserClassroom, Children
+from .models import Classroom, UserClassroom, Child
 
 
 
@@ -40,5 +40,5 @@ class UserClassroomSerializer(serializers.ModelSerializer):
 
 class ChildrenSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Children
+        model = Child
         fields = '__all__'

@@ -12,8 +12,8 @@ from . import manager, types
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     # username = models.CharField(max_length=150, unique=True)
-    first_name = models.CharField(max_length=150, blank=True)
-    last_name = models.CharField(max_length=150, blank=True)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=16, default="", blank=True)
     is_staff = models.BooleanField(default=False)
@@ -21,6 +21,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(default=timezone.now)
     teacher_perm = models.PositiveSmallIntegerField(choices=types.AccessType.choices, default=types.AccessType.NONE)
     parent_perm = models.PositiveSmallIntegerField(choices=types.AccessType.choices, default=types.AccessType.NONE)
+    temp_password = models.CharField(max_length=150, null=True)
 
     objects = manager.UserManager()
 

@@ -1,12 +1,12 @@
 from rest_framework_simplejwt.serializers import serializers
 
-from teacher_panel.models import Children
-from .models import History, Permission, UserChildren, PermittedUser
+from teacher_panel.models import Child
+from .models import History, Permission, UserChild, PermittedUser
 
 
 class UserChildrenSerializer(serializers.ModelSerializer):
     class Meta:
-        model = UserChildren
+        model = UserChild
         fields = '__all__'
 
 class PermissionSerializer(serializers.ModelSerializer):
@@ -28,8 +28,8 @@ class ParentChildrenSerializer(serializers.ModelSerializer):
     classroom_name = serializers.CharField(source='classroom.name', read_only=True)  # Get classroom name
 
     class Meta:
-        model = Children
-        fields = ['id', 'name', 'surname', 'classroom_name']
+        model = Child
+        fields = ['id', 'first_name', 'last_name', 'classroom_name']
 
 class HistorySerializer(serializers.ModelSerializer):
     child_name = serializers.CharField(source='child.name', read_only=True)  # Get child name
@@ -42,3 +42,4 @@ class HistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = History
         fields = '__all__'
+

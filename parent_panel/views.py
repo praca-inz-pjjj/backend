@@ -71,17 +71,60 @@ def generate_QR_code(request, id):
         permission.save()
         return Response({"qr_code": generated_qr_code}, status=status.HTTP_201_CREATED)
 
+@api_view(['GET'])
+@permission_classes([IsParent])
+def get_permitted_users_for_child(request, id):
+    if request.method == 'GET':
+        parent = CustomUser.objects.get(id=request.user.id)
+        child = Child.objects.get(id=id)
+        is_connection = UserChild.objects.filter(user=parent, child=child).exists()
+        if not is_connection:
+            return Response({"data": "You don't have access to this child, how did you get here?"}, status.HTTP_403_FORBIDDEN)
+        permitted_users = PermittedUser.objects.filter(child=child)
+        permitted_users_data = dict()
+        i = 1
+        for permitted_user in permitted_users:
+            if UserChild.objects.filter(user=permitted_user.user, child=child).exists():
+                continue
+            permitted_users_data[i] = {
+                "id" : permitted_user.id, 
+                "user" : permitted_user.user.get_full_name()
+                }
+            i += 1
+        print(permitted_users_data)
+        return Response({
+            "permitted_users" : permitted_users_data
+        })
+
 @api_view(['POST'])
 @permission_classes([IsParent])
-def create_permission(request):
+def create_permission(request, id): #TODO Dwuetapowa weryfikacja
     if request.method == 'POST':
-        serializer = PermissionSerializer(data=request.data)
+        print(request.data)
+        serializer = PermissionSerializer(data={"permitteduser": request.data['permitted_user'],
+                                                "parent": request.user.id,
+                                                "start_date": request.data['start_date'],
+                                                "end_date": request.data['end_date']})
         if serializer.is_valid():
             permission = serializer.save()
-            # Wpisanie permisji do bazy danych
-            Permission.objects.create("""TODO""")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsParent])
+def change_password(request):
+    if request.method == 'POST':
+        print(request.user.id)
+        print(request.data['userId'], request.data['password'])
+        try:
+            user = CustomUser.objects.get(id=request.user.id)
+            user.set_password(request.data['password'])
+            user.temp_password = None
+            user.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ObtainParentTokenPairSerializer(TokenObtainPairSerializer):
     @classmethod
@@ -89,7 +132,15 @@ class ObtainParentTokenPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         if(user.parent_perm != 2):
             raise ValidationError('Podany użytkownik nie jest rodzicem')
+        token['temp_password'] = user.temp_password
         return token
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        # Dodajemy informację do odpowiedzi, jeśli użytkownik ma tymczasowe hasło
+        data['temp_password'] = self.user.temp_password
+        
+        return data
     
 class ObtainParentTokenPairView(TokenObtainPairView):
     serializer_class = ObtainParentTokenPairSerializer

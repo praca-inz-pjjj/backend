@@ -99,7 +99,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
      'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
-     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+     'REFRESH_TOKEN_LIFETIME': timedelta(minutes=30),
      'ROTATE_REFRESH_TOKENS': True,
      'BLACKLIST_AFTER_ROTATION': True
 }
@@ -157,7 +157,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "Europe/Kaliningrad"
+TIME_ZONE = "Etc/GMT-1"
 
 USE_I18N = True
 
