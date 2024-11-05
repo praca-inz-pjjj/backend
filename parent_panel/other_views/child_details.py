@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from backbone.models import CustomUser
 from backbone.permisions import IsParent
-from parent_panel.models import Children, UserChildren, PermittedUser, Permission
+from parent_panel.models import Child, UserChild, PermittedUser, Permission
 from django.utils import timezone
 from zoneinfo import ZoneInfo
 from django.conf import settings
@@ -16,9 +16,9 @@ from parent_panel.other_views.validators.child_validator import ChildValidator
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsParent])
-def get_child_details(request: Request, child_id: int):
+def get_child_details(request: Request, id: int):
     parent = get_object_or_404(CustomUser, id=request.user.id)
-    child = get_object_or_404(Children, id=child_id)
+    child = get_object_or_404(Child, id=id)
     
     if not ChildValidator.is_parent_of_child(parent, child):
             return Response({"message": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
@@ -32,7 +32,7 @@ def get_child_details(request: Request, child_id: int):
             "parent_name": permitted_user.parent.get_full_name(),
             "date": timezone.localtime(permitted_user.date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d"),
             "signature": permitted_user.signature_delivered,
-            "is_parent": UserChildren.objects.filter(user=permitted_user.user, child=child).exists(),
+            "is_parent": UserChild.objects.filter(user=permitted_user.user, child=child).exists(),
         }
         permitted_users_data.append(user_data)
 

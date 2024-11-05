@@ -12,8 +12,8 @@ from . import manager, types
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     # username = models.CharField(max_length=150, unique=True)
-    first_name = models.CharField(max_length=150, blank=True)
-    last_name = models.CharField(max_length=150, blank=True)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=16, default="", blank=True)
     is_staff = models.BooleanField(default=False)

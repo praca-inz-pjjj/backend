@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 
 from .models import *
@@ -11,12 +12,14 @@ class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
         fields = ("email",)
+        field_classes = {"email": forms.EmailField}
 
 class CustomUserChangeForm(UserChangeForm):
 
     class Meta:
         model = CustomUser
         fields = ("email",)
+        field_classes = {"email": forms.EmailField}
 
 class MyUserAdmin(UserAdmin):
     form = CustomUserChangeForm
@@ -25,8 +28,8 @@ class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     form = CustomUserChangeForm
     model = CustomUser
-    list_display = ("email", "is_staff", "is_active",)
-    list_filter = ("email", "is_staff", "is_active",)
+    list_display = ("email", "teacher_perm", "parent_perm", "is_superuser",)
+    list_filter = ("email", "teacher_perm", "parent_perm", "is_superuser",)
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         ("Informacje", {"fields": ("first_name", "last_name", "phone_number", "last_login", "date_joined")}),
@@ -45,7 +48,7 @@ class CustomUserAdmin(UserAdmin):
     ordering = ("email",)
     
 
-admin.site.register(CustomUser, CustomUserAdmin) #TODO add required email field when creating user in admin panel and remove username
+admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Log) 
 admin.site.register(Consent) 
 admin.site.register(UserConsent) 

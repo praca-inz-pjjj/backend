@@ -7,8 +7,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from parent_panel.models import UserChildren
-from teacher_panel.models import Children, UserClassroom
+from parent_panel.models import UserChild
+from teacher_panel.models import Child, UserClassroom
 from csv import writer
 
 
@@ -25,8 +25,8 @@ class DownloadParentList(APIView):
         except:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         try:
-            children_ids = Children.objects.filter(classroom = class_id).values_list('id', flat=True)
-            user_ids = UserChildren.objects.filter(child__in = children_ids).values_list('user', flat=True).distinct()
+            children_ids = Child.objects.filter(classroom = class_id).values_list('id', flat=True)
+            user_ids = UserChild.objects.filter(child__in = children_ids).values_list('user', flat=True).distinct()
             users = CustomUser.objects.filter(id__in = user_ids)
 
             response = HttpResponse(content_type='text/csv')

@@ -4,14 +4,14 @@ from django.db import models
 from django.utils import timezone
 
 from backbone.models import CustomUser as User
-from teacher_panel.models import Children
+from teacher_panel.models import Child
 from backbone.types import PermissionState
 
-# models: UserChildren, History, PermittedUser, Permission
+# models: UserChild, History, PermittedUser, Permission
 
-class UserChildren(models.Model):
+class UserChild(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    child = models.ForeignKey(Children, on_delete=models.CASCADE)
+    child = models.ForeignKey(Child, on_delete=models.CASCADE)
 
     class Meta:
         constraints = [
@@ -21,7 +21,7 @@ class UserChildren(models.Model):
         verbose_name_plural = "Users-Children" # "Dzieci Użytkownika"
 
 class History(models.Model):
-    child = models.ForeignKey(Children, on_delete=models.CASCADE)
+    child = models.ForeignKey(Child, on_delete=models.CASCADE)
     receiver = models.ForeignKey(User, on_delete=models.CASCADE ,related_name='receiver')
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='teacher')
     decision = models.BooleanField(default=True)
@@ -33,7 +33,7 @@ class History(models.Model):
 
 class PermittedUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
-    child = models.ForeignKey(Children, on_delete=models.CASCADE)
+    child = models.ForeignKey(Child, on_delete=models.CASCADE)
     parent = models.ForeignKey(User, on_delete=models.CASCADE, related_name="parent")
     date = models.DateTimeField(default=timezone.now)
     signature_delivered = models.BooleanField(default=False)
