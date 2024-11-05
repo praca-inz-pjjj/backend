@@ -14,7 +14,7 @@ from parent_panel.models import PermittedUser
 from parent_panel.other_views.commons import EMAIL_IS_ALREADY_TAKEN_MESSAGE, NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE, PHONE_IS_ALREADY_TAKEN_MESSAGE
 from parent_panel.other_views.validators.child_validator import ChildValidator
 from parent_panel.other_views.validators.user_validator import UserValidator
-from teacher_panel.models import Children
+from teacher_panel.models import Child
 
 class CreateReceiver(APIView):
     permission_classes = (IsParent, )
@@ -30,7 +30,7 @@ class CreateReceiver(APIView):
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
-        child: Children = get_object_or_404(Children, id=child_id)
+        child: Child = get_object_or_404(Child, id=child_id)
         if not ChildValidator.is_parent_of_child(parent, child):
             return Response({"message": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
 
