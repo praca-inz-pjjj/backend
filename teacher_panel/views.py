@@ -83,7 +83,7 @@ class ObtainTeacherTokenPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         print(user.teacher_perm)
-        if(user.teacher_perm != 2):
+        if(user.teacher_perm < 1):
             raise ValidationError('Podany użytkownik nie jest nauczycielem')
         return token
     
