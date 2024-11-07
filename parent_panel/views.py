@@ -35,7 +35,7 @@ def get_permissions(request):
             obj.save()
         if obj.state != PermissionState.CLOSED:
             permissions.append({
-                "id": obj.id, "parent": obj.parent.get_full_name(), "state": obj.state,
+                "id": obj.id, "child": obj.permitteduser.child.get_full_name(),"parent": obj.parent.get_full_name(), "state": obj.state,
                 "start_date": timezone.localtime(obj.start_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S"),
                 "end_date": timezone.localtime(obj.end_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S")
                 })
@@ -132,7 +132,7 @@ class ObtainParentTokenPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        if(user.parent_perm != 2):
+        if(user.parent_perm < 1):
             raise ValidationError('Podany użytkownik nie jest rodzicem')
         token['temp_password'] = user.temp_password
         return token
