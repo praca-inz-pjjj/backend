@@ -99,17 +99,19 @@ def get_permitted_users_for_child(request, id):
 @api_view(['POST'])
 @permission_classes([IsParent])
 def create_permission(request, id): #TODO Dwuetapowa weryfikacja
-    if request.method == 'POST':
-        print(request.data)
+    print(request.data)
+    try:
         serializer = PermissionSerializer(data={"permitteduser": request.data['permitted_user'],
-                                                "parent": request.user.id,
-                                                "start_date": request.data['start_date'],
-                                                "end_date": request.data['end_date']})
-        if serializer.is_valid():
-            permission = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print(serializer.errors)
+                                            "parent": request.user.id,
+                                            "start_date": request.data['start_date'],
+                                            "end_date": request.data['end_date']})
+    except:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    if serializer.is_valid():
+        permission = serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    print(serializer.errors)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([IsParent])
