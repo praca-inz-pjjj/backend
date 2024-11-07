@@ -1,3 +1,4 @@
+import json
 from django.conf import settings
 from django.utils import timezone
 from zoneinfo import ZoneInfo
@@ -7,8 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from backbone.models import CustomUser
-from parent_panel.serializers import ParentChildrenSerializer
-from parent_panel.models import PermittedUser, UserChild
+from parent_panel.serializers import HistorySerializer, ParentChildrenSerializer
+from parent_panel.models import History, PermittedUser, UserChild
 from backbone.permisions import IsParent
 from teacher_panel.models import Child
 
@@ -32,6 +33,7 @@ class ParentDataView(APIView):
             {
                 "receiver_id": receiver.id,
                 "receiver_name": receiver.user.get_full_name(),
+                "child": receiver.child.id,
                 "child_name": get_object_or_404(Child.objects, id=receiver.child.id).get_full_name(),
                 "parent_name": receiver.parent.get_full_name(),
                 "date": timezone.localtime(receiver.date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d"),
@@ -44,8 +46,13 @@ class ParentDataView(APIView):
         parent = get_object_or_404(CustomUser, id=request.user.id)
         name = parent.get_full_name()
 
+        # Fetch all history data
+        history = History.objects.filter()
+        history_serializer = HistorySerializer(history, many=True)
+
         return Response({
             "parent_name": name,
             "children": children_serializer.data,
+            "history": history_serializer.data,
             "receivers": receivers_data,
         })
