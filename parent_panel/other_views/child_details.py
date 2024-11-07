@@ -36,17 +36,18 @@ def get_child_details(request: Request, id: int):
         }
         permitted_users_data.append(user_data)
 
-        permissions_data = []
-        permissions = Permission.objects.filter(permitteduser=permitted_user)
-        for permission in permissions:
-            permission_data = {
-                "permission_id": permission.id,
-                "user_name": permission.permitteduser.user.get_full_name(),
-                "state": permission.state,
-                "start_date": timezone.localtime(permission.start_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S"),
-                "end_date": timezone.localtime(permission.end_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S"),
-            }
-            permissions_data.append(permission_data)
+    permissions_data = []
+    permitted_users_ids = permitted_users.values_list('id', flat=True)
+    permissions = Permission.objects.filter(permitteduser__in=permitted_users_ids)
+    for permission in permissions:
+        permission_data = {
+            "permission_id": permission.id,
+            "user_name": permission.permitteduser.user.get_full_name(),
+            "state": permission.state,
+            "start_date": timezone.localtime(permission.start_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S"),
+            "end_date": timezone.localtime(permission.end_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S"),
+        }
+        permissions_data.append(permission_data)
 
     return Response({
         "child_id": child.id, 
