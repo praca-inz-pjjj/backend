@@ -5,13 +5,13 @@ from django.core.mail import send_mail
 from django.contrib.auth.models import PermissionsMixin, AbstractUser
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils import timezone
+from django.urls import reverse
 
 from . import manager, types
 
 # models: CustomUser, Log, Consent, UserConsent
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
-    # username = models.CharField(max_length=150, unique=True)
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
@@ -48,6 +48,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
+    def get_admin_url(self):
+        return reverse("admin:backbone_customuser_change", args=[self.id])
+
     class Meta:
         verbose_name = "User" # "Użytkownik"
         verbose_name_plural = "Users" # "Użytkownicy"
@@ -65,6 +68,12 @@ class Consent(models.Model):
     consent_type = models.CharField(max_length=16, choices=types.ConsentType.choices, default=types.ConsentType.INFORMATION)
     change_date = models.DateTimeField(auto_now=True)
     description = models.TextField()
+
+    def __str__(self):
+        return "Consent" + " " + str(self.id)
+
+    def get_admin_url(self):
+        return reverse("admin:backbone_consent_change", args=[self.id])
 
     class Meta:
         constraints = [

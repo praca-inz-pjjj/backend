@@ -2,6 +2,7 @@ from datetime import timedelta
 
 from django.db import models
 from django.utils import timezone
+from django.urls import reverse
 
 from backbone.models import CustomUser as User
 from teacher_panel.models import Child
@@ -37,6 +38,12 @@ class PermittedUser(models.Model):
     parent = models.ForeignKey(User, on_delete=models.CASCADE, related_name="parent")
     date = models.DateTimeField(default=timezone.now)
     signature_delivered = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.user)
+    
+    def get_admin_url(self):
+        return reverse("admin:parent_panel_permitteduser_change", args=[self.id])
 
     class Meta:
         constraints = [

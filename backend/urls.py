@@ -22,6 +22,9 @@ from rest_framework_simplejwt.views import  TokenRefreshView
 
 from . import views
 
+admin.site.site_title = "SafeKid site admin"
+admin.site.site_header = "SafeKid administration"
+
 urlpatterns = [
     path('', lambda req: redirect('/health')),
     path("admin/", admin.site.urls),
