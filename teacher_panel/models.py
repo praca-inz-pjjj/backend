@@ -1,11 +1,19 @@
 from django.db import models
+from django.urls import reverse
+
 from backbone.models import CustomUser as User
 
 # models: Classroom UserClassroom Child
 
 class Classroom(models.Model):
     name = models.CharField(unique=True, max_length=100)
-
+    
+    def __str__(self):
+        return self.name
+    
+    def get_admin_url(self):
+        return reverse("admin:teacher_panel_classroom_change", args=[self.id])
+    
     class Meta:
         verbose_name = "Classroom" # "Klasa" 
         verbose_name_plural = "Classrooms" # "Klasy"
@@ -27,6 +35,19 @@ class Child(models.Model):
     classroom = models.ForeignKey(Classroom, on_delete=models.CASCADE)
     birth_date = models.DateField(max_length=8)
 
+    def get_full_name(self):
+        """
+        Return the first_name plus the last_name, with a space in between.
+        """
+        full_name = "%s %s" % (self.first_name, self.last_name)
+        return full_name.strip()
+    
+    def __str__(self):
+        return self.get_full_name()
+    
+    def get_admin_url(self):
+        return reverse("admin:teacher_panel_child_change", args=[self.id])
+    
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=['first_name', 'last_name', 'birth_date'], name='unique_name_surname_birth_date')
@@ -34,9 +55,3 @@ class Child(models.Model):
         verbose_name = "Child" # "Dziecko"
         verbose_name_plural = "Children" # "Dzieci"
 
-    def get_full_name(self):
-        """
-        Return the first_name plus the last_name, with a space in between.
-        """
-        full_name = "%s %s" % (self.first_name, self.last_name)
-        return full_name.strip()
