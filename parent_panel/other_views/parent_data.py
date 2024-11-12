@@ -31,9 +31,9 @@ class ParentDataView(APIView):
 
         receivers_data = [
             {
-                "receiver_id": receiver.id,
+                "receiver_id": receiver.user_id,
                 "receiver_name": receiver.user.get_full_name(),
-                "child": receiver.child.id,
+                "child": receiver.child_id,
                 "child_name": get_object_or_404(Child.objects, id=receiver.child.id).get_full_name(),
                 "parent_name": receiver.parent.get_full_name(),
                 "date": timezone.localtime(receiver.date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d"),
@@ -47,7 +47,7 @@ class ParentDataView(APIView):
         name = parent.get_full_name()
 
         # Fetch all history data
-        history = History.objects.filter()
+        history = History.objects.filter(child_id__in=parent_children_ids)
         history_serializer = HistorySerializer(history, many=True)
 
         return Response({
