@@ -25,7 +25,7 @@ class ParentReceiversView(APIView):
 
         receivers_data = [
             {
-                "receiver_id": receiver.id,
+                "receiver_id": receiver.user_id,
                 "receiver_name": receiver.user.get_full_name(),
                 "child_name": get_object_or_404(Child.objects, id=receiver.child.id).get_full_name(),
                 "child_id": get_object_or_404(Child.objects, id=receiver.child.id).id,
