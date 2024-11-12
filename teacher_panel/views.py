@@ -1,5 +1,6 @@
 from django.http import HttpRequest
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -19,10 +20,14 @@ from rest_framework.exceptions import ValidationError
 @api_view(['GET'])
 @permission_classes([IsTeacher])
 def teacher_data(request):
-    classes = dict()
     user_classes = UserClassroom.objects.filter(user_id=request.user.id)
-    for class_obj in user_classes:
-         classes[class_obj.classroom_id] = Classroom.objects.get(id=class_obj.classroom_id).name
+    classes = [
+        {
+            'id': class_obj.classroom_id,
+            'name': Classroom.objects.get(id=class_obj.classroom_id).name,
+            'size': Child.objects.filter(classroom_id=class_obj.classroom_id).count()
+        } for class_obj in user_classes
+    ]
     teacher = CustomUser.objects.get(id=request.user.id)
     name = teacher.get_full_name()
     return Response({
@@ -32,11 +37,15 @@ def teacher_data(request):
 
 @api_view(['GET'])
 @permission_classes([IsTeacher])
-def class_data(request, id):
-    children = dict()
-    objects = Child.objects.filter(classroom_id=id)
-    for obj in objects:
-        children[obj.id] = {'name': obj.first_name, 'surname': obj.last_name}
+def class_data(request: Request, id):
+    children = [
+        {
+            'id': child.id,
+            'name': child.first_name,
+            'surname': child.last_name,
+            'birth_date': child.birth_date,
+        } for child in Child.objects.filter(classroom_id=id)
+    ]
     classroom = Classroom.objects.get(id=id)
     return Response({
         "id": id,
