@@ -20,7 +20,11 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt.views import  TokenRefreshView
 
+from backend.use_cases.passwordResetConfirm import PasswordResetConfirmView
+from backend.use_cases.resetPassword import PasswordResetRequestView
+
 from . import views
+from django.contrib.auth import views as auth_views
 
 admin.site.site_title = "SafeKid site admin"
 admin.site.site_header = "SafeKid administration"
@@ -32,4 +36,6 @@ urlpatterns = [
     path("refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("teacher/", include("teacher_panel.urls")),
     path("parent/", include("parent_panel.urls")),
+    path("reset-password", PasswordResetRequestView.as_view(), name="reset_password"),
+    path("password-reset-confirm/<int:uid>/<str:token>/", PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
 ]
