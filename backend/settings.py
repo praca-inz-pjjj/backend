@@ -40,7 +40,7 @@ AUTH_USER_MODEL = 'backbone.CustomUser'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_PORT = 587
+EMAIL_PORT = int(os.getenv('SMTP_PORT'))
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('USERNAME')
 EMAIL_HOST_PASSWORD = os.getenv('PASSWORD')
