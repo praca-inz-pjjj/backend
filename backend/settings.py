@@ -38,6 +38,16 @@ if SECURE_SSL_REDIRECT:
 
 AUTH_USER_MODEL = 'backbone.CustomUser'
 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = int(os.getenv('SMTP_PORT', "587"))
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('USERNAME')
+EMAIL_HOST_PASSWORD = os.getenv('PASSWORD')
+DEFAULT_FROM_MAIL = os.getenv('SENDER_MAIL')
+FRONTEND_LINK = os.getenv('FRONTEND_LINK')
+SENDER_NAME = os.getenv('SENDER_NAME')
+WEBSITE = os.getenv('WEBSITE')
 
 # Application definition
 
