@@ -7,9 +7,10 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from backbone.models import CustomUser
+from parent_panel.models import Permission
 from .serializers import ClassroomSerializer, ChildrenSerializer
 from .models import *
-from backbone.permisions import IsTeacher
+from backbone.permisions import IsTeacher, IsIssuer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.exceptions import ValidationError
@@ -85,6 +86,35 @@ def create_child(request, id):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsIssuer])
+def check_receipt(request):
+    if request.method == 'GET':
+        try:
+            id = request.GET.get('id')
+            permission = Permission.objects.get(qr_code = id)
+            is_two_factor = False if permission.two_factor_code == None else True
+            print(is_two_factor)
+            return Response({'id': id, 'is_two_factor': is_two_factor})
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        
+@api_view(['GET'])
+@permission_classes([IsIssuer])
+def check_two_factor_code(request):
+    if request.method == 'GET':
+        try:
+            id = request.GET.get('id')
+            two_factor_code = request.GET.get('twofactor')
+            print(two_factor_code)
+            permission = Permission.objects.get(qr_code = id)
+            correct = True if str(permission.two_factor_code) == two_factor_code else False
+            print(correct)
+            print(two_factor_code + " " + str(permission.two_factor_code) + " " + str(correct))
+            return Response({'id': id, 'correct': correct})
+        except:
+            return Response(data={'correct': False})
 
 
 class ObtainTeacherTokenPairSerializer(TokenObtainPairSerializer):

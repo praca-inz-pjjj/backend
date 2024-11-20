@@ -1,6 +1,6 @@
 import json
 from backbone.models import CustomUser
-from backbone.permisions import IsTeacher
+from backbone.permisions import IsIssuer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,7 +17,7 @@ from teacher_panel.serializers import ChildrenSerializer
 
 
 class AcceptReceiptView(APIView):
-    permission_classes = [IsTeacher]
+    permission_classes = [IsIssuer]
     def get(self, request):
         try:
             id = request.GET.get('id')

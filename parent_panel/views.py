@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.http import HttpRequest
 from django.utils import timezone
 from django.conf import settings
+from rest_framework.request import Request
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,9 +13,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from backbone.permisions import IsReceiver, IsParent
-from backbone.models import CustomUser
+from backbone.models import CustomUser, Log
+from backbone.types import LogType
+from backend.utils.sendmail import sendmail
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework.exceptions import ValidationError
 from teacher_panel.serializers import ChildrenSerializer
 from .serializers import PermissionSerializer
@@ -62,13 +66,13 @@ def generate_QR_code(request, id):
             permission.save()
             return Response({"data": "This permission has expired"}, status.HTTP_412_PRECONDITION_FAILED)
         generated_qr_code = randbelow(90000000) + 10000000
-        print("Generated QR Code: " + str(generated_qr_code))
         permission.qr_code = generated_qr_code
         if (permission.state == PermissionState.SLEEP or permission.state == PermissionState.NOTIFY):
             permission.state = PermissionState.ACTIVE
         if permission.state == PermissionState.PERMANENT:
             permission.end_date = timezone.now() + timedelta(minutes=5)
         permission.save()
+        Log.objects.create(log_type=LogType.CREATE, data={"type" : "QR Code", "value" : generated_qr_code, "receiver_id" : receiver.id})
         return Response({"qr_code": generated_qr_code}, status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
@@ -98,8 +102,7 @@ def get_permitted_users_for_child(request, id):
 
 @api_view(['POST'])
 @permission_classes([IsParent])
-def create_permission(request, id): #TODO Dwuetapowa weryfikacja
-    print(request.data)
+def create_permission(request, id):
     try:
         serializer = PermissionSerializer(data={"permitteduser": request.data['permitted_user'],
                                             "parent": request.user.id,
@@ -109,8 +112,14 @@ def create_permission(request, id): #TODO Dwuetapowa weryfikacja
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     if serializer.is_valid():
         permission = serializer.save()
+        if request.data['two_factor_verification']:
+            two_factor_code = randbelow(90000000) + 10000000
+            permission.two_factor_code = two_factor_code
+            permission.save()
+            sendmail(CustomUser.objects.get(id=request.user.id).email, "Kod do weryfikacji dwuetapowej", 
+                     f"<p>Przekaż kod do odbierającego: <strong>{two_factor_code}</strong></p><p>Jeśli mail jest nieoczekiwany, prosimy pilnie skontaktować się z administratorem systemu.</p>")
+        Log.objects.create(log_type=LogType.CREATE, data={"type" : "Permission", "permission_id" : permission.id, "parent_id" : request.user.id})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    print(serializer.errors)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
@@ -135,6 +144,7 @@ class ObtainParentTokenPairSerializer(TokenObtainPairSerializer):
         if(user.parent_perm < 1):
             raise ValidationError('Podany użytkownik nie jest rodzicem')
         token['temp_password'] = user.temp_password
+        Log.objects.create(log_type=LogType.LOGIN, data={"email": user.email})
         return token
     def validate(self, attrs):
         data = super().validate(attrs)

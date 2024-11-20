@@ -16,6 +16,8 @@ urlpatterns = [
     path('class/create', views.create_classroom, name='create_classroom'),
     path('class/<int:id>/child', views.create_child, name='create_child'),
     path('child/<int:id>', ChildParentsView.as_view()),
+    path('check-receipt', views.check_receipt, name='check_receipt'),
+    path('check-twofactorcode', views.check_two_factor_code, name='check_two_factor_code'),
     path('receipt', AcceptReceiptView.as_view()),
     path('create-parent', CreateParent.as_view()),
     path('class/<int:id>/download', DownloadParentList.as_view())

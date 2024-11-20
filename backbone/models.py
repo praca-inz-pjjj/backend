@@ -44,10 +44,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         """Return the short name for the user."""
         return self.first_name
 
-    def email_user(self, subject, message, from_email=None, **kwargs): #TODO create mail and connect it to project
-        """Send an email to this user."""
-        send_mail(subject, message, from_email, [self.email], **kwargs)
-
     def get_admin_url(self):
         return reverse("admin:backbone_customuser_change", args=[self.id])
 
