@@ -113,6 +113,19 @@ def create_permission(request, id): #TODO Dwuetapowa weryfikacja
     print(serializer.errors)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@api_view(['DELETE'])
+@permission_classes([IsParent])
+def delete_permission(request, perm_id):
+    try:
+        permission = Permission.objects.get(id=perm_id)
+    except:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    # check if permission child is connected to parent
+    if not UserChild.objects.filter(user=request.user, child=permission.permitteduser.child).exists():
+        return Response(status=status.HTTP_403_FORBIDDEN)
+    permission.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
+
 @api_view(['POST'])
 @permission_classes([IsParent])
 def change_password(request):
