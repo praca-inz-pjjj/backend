@@ -4,12 +4,13 @@ import json
 from urllib.request import Request
 
 from django.shortcuts import get_object_or_404
-from backbone.models import CustomUser
+from backbone.models import CustomUser, Log
 from backbone.permisions import IsParent
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from backbone.types import LogType
 from parent_panel.models import PermittedUser
 from parent_panel.other_views.commons import EMAIL_IS_ALREADY_TAKEN_MESSAGE, NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE, PHONE_IS_ALREADY_TAKEN_MESSAGE
 from parent_panel.other_views.validators.child_validator import ChildValidator
@@ -52,6 +53,7 @@ class CreateReceiver(APIView):
                 temp_password=password)
             user.set_password(password)
             user.save()
+            Log.objects.create(log_type=LogType.CREATE, data={"type" : "User", "user_id" : user.id, "creator_id" : parent.id})
 
             permitted_user = PermittedUser(
                 user = user,
@@ -59,6 +61,7 @@ class CreateReceiver(APIView):
                 parent = parent
             )
             permitted_user.save()
+            Log.objects.create(log_type=LogType.CREATE, data={"type" : "Permitted User", "permitted_user_id" : permitted_user.id, "parent_id" : parent.id})
 
             return Response({
                 'first_name': first_name,

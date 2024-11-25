@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from backbone.models import CustomUser
 from backbone.permisions import IsParent
+from backbone.types import PermissionState
 from parent_panel.models import Child, UserChild, PermittedUser, Permission
 from django.utils import timezone
 from zoneinfo import ZoneInfo
@@ -40,6 +41,10 @@ def get_child_details(request: Request, id: int):
     permitted_users_ids = permitted_users.values_list('id', flat=True)
     permissions = Permission.objects.filter(permitteduser__in=permitted_users_ids)
     for permission in permissions:
+        if (permission.end_date < timezone.now() and permission.state != PermissionState.PERMANENT and permission.state != PermissionState.CLOSED):
+            permission.state = PermissionState.CLOSED
+            permission.save()
+            continue
         permission_data = {
             "permission_id": permission.id,
             "user_name": permission.permitteduser.user.get_full_name(),

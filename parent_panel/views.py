@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.http import HttpRequest
 from django.utils import timezone
 from django.conf import settings
+from django.forms.models import model_to_dict
 from rest_framework.request import Request
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -34,7 +35,7 @@ def get_permissions(request):
     permissions = []
     objects = Permission.objects.filter(permitteduser__user=user)
     for obj in objects:
-        if (obj.end_date < timezone.now() and obj.state != PermissionState.PERMANENT ):
+        if (obj.end_date < timezone.now() and obj.state != PermissionState.PERMANENT and obj.state != PermissionState.CLOSED):
             obj.state = PermissionState.CLOSED
             obj.save()
         if obj.state != PermissionState.CLOSED:
@@ -72,7 +73,7 @@ def generate_QR_code(request, id):
         if permission.state == PermissionState.PERMANENT:
             permission.end_date = timezone.now() + timedelta(minutes=5)
         permission.save()
-        Log.objects.create(log_type=LogType.CREATE, data={"type" : "QR Code", "value" : generated_qr_code, "receiver_id" : receiver.id})
+        Log.objects.create(log_type=LogType.CREATE, data={"type" : "QR Code", "value" : generated_qr_code, "permission_id" : permission.id})
         return Response({"qr_code": generated_qr_code}, status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
@@ -132,6 +133,7 @@ def delete_permission(request, perm_id):
     # check if permission child is connected to parent
     if not UserChild.objects.filter(user=request.user, child=permission.permitteduser.child).exists():
         return Response(status=status.HTTP_403_FORBIDDEN)
+    Log.objects.create(log_type=LogType.DELETE, data={"type" : "Permission", "permission" : model_to_dict(permission), "parent_id" : request.user.id})
     permission.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -157,7 +159,7 @@ class ObtainParentTokenPairSerializer(TokenObtainPairSerializer):
         if(user.parent_perm < 1):
             raise ValidationError('Podany użytkownik nie jest rodzicem')
         token['temp_password'] = user.temp_password
-        Log.objects.create(log_type=LogType.LOGIN, data={"email": user.email})
+        Log.objects.create(log_type=LogType.LOGIN, data={"panel": "parent", "email": user.email})
         return token
     def validate(self, attrs):
         data = super().validate(attrs)

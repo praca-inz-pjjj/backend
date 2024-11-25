@@ -1,9 +1,9 @@
 from pyclbr import Class
 from django.utils import timezone
-from backbone.models import CustomUser
+from backbone.models import CustomUser, Log
 from backbone.permisions import IsTeacher
 from backbone.serializers import CustomUserSerializer, PermittedUserSerializer
-from backbone.types import PermissionState
+from backbone.types import LogType, PermissionState
 from parent_panel.models import Permission, PermittedUser, UserChild
 from parent_panel.serializers import UserChildrenSerializer, PermissionSerializer
 from teacher_panel.models import Child, Classroom
@@ -45,6 +45,7 @@ class ChildParentsView(APIView):
             item.delete()
 
             permittedUser = PermittedUser.objects.get(child = id, user = id_parent, parent = id_parent)
+            Log.objects.create(log_type=LogType.DELETE, data={"type" : "UserChild", "child_id" : id, "parent_id" : id_parent, "teacher_id" : request.user.id})
             permittedUser.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except:
@@ -62,6 +63,7 @@ class ChildParentsView(APIView):
                     permissionSerializer = PermissionSerializer(data = {'permitteduser': saved_permittedUser.id, 'state': PermissionState.PERMANENT, 'parent': id_parent, 'end_date': timezone.now()})
                     if permissionSerializer.is_valid():
                         permissionSerializer.save()
+                        Log.objects.create(log_type=LogType.CREATE, data={"type" : "UserChild", "child_id" : id, "parent_id" : id_parent, "teacher_id" : request.user.id})
                         return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(status=status.HTTP_400_BAD_REQUEST)
         except:
