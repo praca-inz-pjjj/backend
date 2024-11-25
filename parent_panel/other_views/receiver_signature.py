@@ -25,7 +25,7 @@ class ReceiverSignatureView(APIView):
             if not ChildValidator.is_parent_of_child(parent, child):
                 return Response({"message": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
             
-            receiver: PermittedUser = get_object_or_404(PermittedUser, id=receiver_id)
+            receiver: PermittedUser = get_object_or_404(PermittedUser, user_id=receiver_id, child_id=child_id)
             receiver.signature_delivered = True
             receiver.save()
             return Response(status=status.HTTP_200_OK)
