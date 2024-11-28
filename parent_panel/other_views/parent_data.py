@@ -7,7 +7,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from backbone.models import CustomUser
+from backbone.models import CustomUser, Log
+from backbone.types import LogType
 from parent_panel.serializers import HistorySerializer, ParentChildrenSerializer
 from parent_panel.models import History, PermittedUser, UserChild
 from backbone.permisions import IsParent
@@ -49,6 +50,8 @@ class ParentDataView(APIView):
         # Fetch all history data
         history = History.objects.filter(child_id__in=parent_children_ids)
         history_serializer = HistorySerializer(history, many=True)
+
+        Log.objects.create(log_type=LogType.HISTORY, data={"children_ids" : parent_children_ids, "parent_id" : parent.id})
 
         return Response({
             "parent_name": name,

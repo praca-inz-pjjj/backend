@@ -1,9 +1,11 @@
 import json
-from backbone.models import CustomUser
+from backbone.models import CustomUser, Log
 from backbone.permisions import IsTeacher
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
+from backbone.types import LogType
 
 class CreateParent(APIView):
     permission_classes = [IsTeacher]
@@ -30,6 +32,7 @@ class CreateParent(APIView):
                 temp_password=password)
             user.set_password(password)
             user.save()
+            Log.objects.create(log_type=LogType.CREATE, data={"type" : "Parent", "parent_id" : user.id, "teacher_id" : request.user.id})
             return Response({
                 'first_name': first_name,
                 'second_name': second_name,

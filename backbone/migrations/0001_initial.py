@@ -64,13 +64,13 @@ class Migration(migrations.Migration):
                     models.CharField(
                         choices=[
                             ("LOGIN", "Login"),
+                            ("PASSWORD_RESET", "Password Reset"),
                             ("CREATE", "Create"),
                             ("DELETE", "Delete"),
                             ("IMPORT", "Import"),
-                            ("ADD_PARENT", "Add Parent"),
                             ("HISTORY", "History"),
-                            ("ADD_PERMISSION", "Add Permission"),
                             ("SIGN", "Sign"),
+                            ("ISSUE", "Issue"),
                             ("WARNING", "Warning"),
                             ("ERROR", "Error"),
                             ("INFO", "Info"),

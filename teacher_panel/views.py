@@ -7,7 +7,8 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from backbone.models import CustomUser
+from backbone.models import CustomUser, Log
+from backbone.types import LogType
 from parent_panel.models import Permission
 from .serializers import ClassroomSerializer, ChildrenSerializer
 from .models import *
@@ -76,6 +77,7 @@ def create_classroom(request):
             classroom = serializer.save()
             # Przypisanie klasy do nauczyciela
             UserClassroom.objects.create(user=request.user, classroom=classroom)
+            Log.objects.create(log_type=LogType.CREATE, data={"type" : "Classroom", "classroom_id" : classroom.id, "teacher_id" : request.user.id})
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -86,7 +88,8 @@ def create_child(request, id):
         return Response(status=status.HTTP_400_BAD_REQUEST)
     serializer = ChildrenSerializer(data=request.data)
     if serializer.is_valid():
-        serializer.save()
+        child = serializer.save()
+        Log.objects.create(log_type=LogType.CREATE, data={"type" : "Child", "child_id" : child.id, "teacher_id" : request.user.id})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -124,9 +127,9 @@ class ObtainTeacherTokenPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        print(user.teacher_perm)
         if(user.teacher_perm < 1):
             raise ValidationError('Podany użytkownik nie jest nauczycielem')
+        Log.objects.create(log_type=LogType.LOGIN, data={"panel": "teacher", "email": user.email})
         return token
     
 class ObtainTeacherTokenPairView(TokenObtainPairView):

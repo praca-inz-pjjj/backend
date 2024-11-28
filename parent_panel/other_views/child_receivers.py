@@ -3,8 +3,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django.forms.models import model_to_dict
 from backbone.permisions import IsParent
-from backbone.models import CustomUser
+from backbone.models import CustomUser, Log
+from backbone.types import LogType
 from parent_panel.other_views.commons import NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE, USER_ALREADY_PERMITTED_MESSAGE
 from .validators.child_validator import ChildValidator
 from ..serializers import PermittedUserSerializer
@@ -46,6 +48,7 @@ class ChildReceiversView(APIView):
 
         permitted_user_entry = PermittedUser.objects.create(child=child, user=permitted_user)
         serializer = PermittedUserSerializer(permitted_user_entry)
+        Log.objects.create(log_type=LogType.CREATE, data={"type" : "Permitted User", "permitted_user_id" : permitted_user_entry.id, "parent_id" : parent.id})
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     # Revoke permission to child
@@ -66,5 +69,6 @@ class ChildReceiversView(APIView):
         if not permitted_user_entry:
             return Response({"message": "User is not permitted for this child."}, status=status.HTTP_404_NOT_FOUND)
 
+        Log.objects.create(log_type=LogType.DELETE, data={"type" : "Permitted User", "permitted_user" : model_to_dict(permitted_user_entry), "parent_id" : parent.id})
         permitted_user_entry.delete()
         return Response({"message": "User removed from permitted list successfully."}, status=status.HTTP_204_NO_CONTENT)

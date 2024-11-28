@@ -1,12 +1,12 @@
 import json
-from backbone.models import CustomUser
+from backbone.models import CustomUser, Log
 from backbone.permisions import IsIssuer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
 from backbone.serializers import CustomUserSerializer, PermittedUserSerializer
-from backbone.types import PermissionState
+from backbone.types import LogType, PermissionState
 from parent_panel.models import History, Permission, PermittedUser
 from parent_panel.serializers import HistorySerializer, PermissionSerializer
 from datetime import datetime
@@ -73,10 +73,11 @@ class AcceptReceiptView(APIView):
                 historySerializer = HistorySerializer(data = {'child': permittedUserSerializer.data['child'], 'receiver': permittedUserSerializer.data['user'], 'teacher': request.user.id, 'decision': acceptance, 'date': timezone.now()})
 
                 if historySerializer.is_valid():
-                    historySerializer.save()
+                    history = historySerializer.save()
                     if permission.state != PermissionState.PERMANENT:
                         permission.state = PermissionState.CLOSED
                         permission.save()
+                    Log.objects.create(log_type=LogType.CREATE, data={"type" : "History", "history_id" : history.id, "receiver_id" : receiver_id, "child_id" : permittedUserSerializer.data['child']})
                     return Response(status=status.HTTP_204_NO_CONTENT)
                 
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
