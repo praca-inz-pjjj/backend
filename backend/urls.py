@@ -24,7 +24,7 @@ from backend.use_cases.passwordResetConfirm import PasswordResetConfirmView
 from backend.use_cases.resetPassword import PasswordResetRequestView
 
 from . import views
-from django.contrib.auth import views as auth_views
+from .use_cases.changePassword import change_password
 
 admin.site.site_title = "SafeKid site admin"
 admin.site.site_header = "SafeKid administration"
@@ -38,4 +38,5 @@ urlpatterns = [
     path("parent/", include("parent_panel.urls")),
     path("reset-password", PasswordResetRequestView.as_view(), name="reset_password"),
     path("password-reset-confirm/<int:uid>/<str:token>/", PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
+    path("change-password", change_password, name='change-password'),
 ]
