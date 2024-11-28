@@ -135,21 +135,6 @@ def delete_permission(request, perm_id):
     permission.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-@api_view(['POST'])
-@permission_classes([IsParent])
-def change_password(request):
-    if request.method == 'POST':
-        print(request.user.id)
-        print(request.data['userId'], request.data['password'])
-        try:
-            user = CustomUser.objects.get(id=request.user.id)
-            user.set_password(request.data['password'])
-            user.temp_password = None
-            user.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 class ObtainParentTokenPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):

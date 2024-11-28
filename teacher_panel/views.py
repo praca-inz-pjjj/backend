@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.http import HttpRequest
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
@@ -81,6 +82,8 @@ def create_classroom(request):
 @api_view(['POST'])
 @permission_classes([IsTeacher])
 def create_child(request, id):
+    if datetime.strptime(request.data['birth_date'], "%Y-%m-%d") >= datetime.now():
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     serializer = ChildrenSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()

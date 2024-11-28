@@ -22,7 +22,6 @@ urlpatterns = [
     path("child/<int:id>/permitted-users", views.get_permitted_users_for_child, name="get_permitted_users_for_child"),
     path("child/<int:id>/create-permission", views.create_permission, name="create_permission"),
     path("permission/<int:perm_id>", views.delete_permission, name="delete_permission"),
-    path("change-password", views.change_password, name='change-password'),
     path("receivers", ParentReceiversView.as_view(), name="get_parent_receivers"),
     path("children", ParentChildrenView.as_view(), name="get_parent_children"),
     path("child/<int:child_id>/create-receiver", CreateReceiver.as_view(), name="create_receiver"),
