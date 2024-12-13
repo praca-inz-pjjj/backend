@@ -12,7 +12,6 @@ class ReceiverView(APIView):
     permission_classes = (IsParent,)
 
     def get(self, request: Request, receiver_id: int) -> Response:
-        # Fetch all history data
         child_id = request.query_params.get('child')
         history = History.objects.filter(receiver=receiver_id, child=child_id)
         history_serializer = HistorySerializer(history, many=True)

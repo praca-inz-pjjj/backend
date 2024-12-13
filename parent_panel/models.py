@@ -31,6 +31,7 @@ class History(models.Model):
     class Meta:
         verbose_name = "History" # "Historia"
         verbose_name_plural = "History" # "Historia"
+        ordering = ['-date']
 
 class PermittedUser(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")

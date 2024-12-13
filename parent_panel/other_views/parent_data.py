@@ -51,7 +51,7 @@ class ParentDataView(APIView):
         history = History.objects.filter(child_id__in=parent_children_ids)
         history_serializer = HistorySerializer(history, many=True)
 
-        Log.objects.create(log_type=LogType.HISTORY, data={"children_ids" : parent_children_ids, "parent_id" : parent.id})
+        Log.objects.create(log_type=LogType.HISTORY, data={"children_ids" : list(parent_children_ids), "parent_id" : parent.id})
 
         return Response({
             "parent_name": name,
