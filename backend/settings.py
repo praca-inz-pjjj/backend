@@ -42,12 +42,12 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_PORT = int(os.getenv('SMTP_PORT', "587"))
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv('USERNAME')
-EMAIL_HOST_PASSWORD = os.getenv('PASSWORD')
+EMAIL_HOST_USER = os.getenv('MAIL_USERNAME')
+EMAIL_HOST_PASSWORD = os.getenv('MAIL_PASSWORD')
 DEFAULT_FROM_MAIL = os.getenv('SENDER_MAIL')
 FRONTEND_LINK = os.getenv('FRONTEND_LINK')
 SENDER_NAME = os.getenv('SENDER_NAME')
-WEBSITE = os.getenv('WEBSITE')
+WEBSITE = os.getenv('FRONT_WEBSITE')
 
 # Application definition
 
