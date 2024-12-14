@@ -11,6 +11,7 @@ from .other_views.parent_receivers import ParentReceiversView
 from .other_views.receiver import ReceiverView # type: ignore
 from parent_panel.other_views.parent_children import ParentChildrenView
 from .other_views.receiver_signature import ReceiverSignatureView
+from .other_views.history import ParentHistoryDataView
 
 urlpatterns = [
     path("", ParentDataView.as_view()),
@@ -27,4 +28,5 @@ urlpatterns = [
     path("child/<int:child_id>/create-receiver", CreateReceiver.as_view(), name="create_receiver"),
     path("receiver/<int:receiver_id>/signature", ReceiverSignatureView.as_view(), name="receiver_signature"),
     path("receiver/<int:receiver_id>", ReceiverView.as_view(), name="get_receiver_details"),
+    path("history", ParentHistoryDataView.as_view(), name="get_parent_history"),
 ]
