@@ -28,7 +28,7 @@ def get_child_details(request: Request, id: int):
     permitted_users = PermittedUser.objects.filter(child=child)
     for permitted_user in permitted_users:
         user_data = {
-            "user_id": permitted_user.id,
+            "user_id": permitted_user.user.id,
             "user_name": permitted_user.user.get_full_name(),
             "parent_name": permitted_user.parent.get_full_name(),
             "date": timezone.localtime(permitted_user.date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d"),
