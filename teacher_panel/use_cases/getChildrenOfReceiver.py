@@ -33,7 +33,6 @@ class GetChildrenOfReceiverView(APIView):
                 child = Child.objects.get(id=permitteduserSerializer.data['child'])
                 childrenSerializer = ChildrenSerializer(child)
                 obj.append({'permission': permission, 'child': childrenSerializer.data})
-            print({'objects': obj})
             return Response({'objects': obj}, status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
