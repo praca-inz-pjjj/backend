@@ -1,5 +1,5 @@
 from datetime import datetime
-from django.http import HttpRequest
+from django.db import transaction
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -55,18 +55,7 @@ def class_data(request: Request, id):
         "children": children,
         "class_name": classroom.name,
     })
-    
 
-# class LogoutView(APIView):
-#      permission_classes = (IsTeacher,)
-#      def post(self, request):
-#           try:
-#                refresh_token = request.data["refresh_token"]
-#                token = RefreshToken(refresh_token)
-#                token.blacklist()
-#                return Response(status=status.HTTP_205_RESET_CONTENT)
-#           except Exception as e:
-#                return Response(status=status.HTTP_400_BAD_REQUEST)
            
 @api_view(['POST'])
 @permission_classes([IsTeacher])

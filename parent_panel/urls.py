@@ -8,7 +8,7 @@ from .other_views.child_receivers import ChildReceiversView
 from .other_views.parent_data import ParentDataView
 from .other_views.child_details import get_child_details
 from .other_views.parent_receivers import ParentReceiversView
-from .other_views.receiver import ReceiverView # type: ignore
+from .other_views.receiver import ReceiverView
 from parent_panel.other_views.parent_children import ParentChildrenView
 from .other_views.receiver_signature import ReceiverSignatureView
 from .other_views.history import ParentHistoryDataView
