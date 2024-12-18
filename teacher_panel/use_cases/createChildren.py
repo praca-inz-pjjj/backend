@@ -47,4 +47,6 @@ def create_children(request: Request, id: int):
                 )
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        if "unique" in str(e):
+            return Response({"error": "Podane dziecko już istnieje."}, status=status.HTTP_409_CONFLICT)
+        return Response({}, status=status.HTTP_400_BAD_REQUEST)
