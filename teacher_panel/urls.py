@@ -1,6 +1,8 @@
 from django.urls import path
 
 from teacher_panel.use_cases.downloadParentList import DownloadParentList
+from teacher_panel.use_cases.getChildrenOfReceiver import GetChildrenOfReceiverView
+from teacher_panel.use_cases.getReceivers import GetReceiversView
 
 
 from .use_cases.acceptReceipt import AcceptReceiptView
@@ -22,5 +24,7 @@ urlpatterns = [
     path('check-twofactorcode', views.check_two_factor_code, name='check_two_factor_code'),
     path('receipt', AcceptReceiptView.as_view()),
     path('create-parent', CreateParent.as_view()),
-    path('class/<int:id>/download', DownloadParentList.as_view())
+    path('class/<int:id>/download', DownloadParentList.as_view()),
+    path('receivers', GetReceiversView.as_view()),
+    path('children/<int:id>', GetChildrenOfReceiverView.as_view())
 ]

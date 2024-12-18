@@ -62,12 +62,12 @@ class AcceptReceiptView(APIView):
             permission = Permission.objects.get(id = permission_id)
             permissionSerializer = PermissionSerializer(permission)
 
-            if permissionSerializer['state'].value == 'ACTIVE' or permissionSerializer['state'].value == 'PERMANENT':
+            if permissionSerializer['state'].value == 'ACTIVE' or permissionSerializer['state'].value == 'SLEEP' or permissionSerializer['state'].value == 'PERMANENT':
 
                 permittedUser = PermittedUser.objects.get(id = permissionSerializer.data['permitteduser'])
                 permittedUserSerializer = PermittedUserSerializer(permittedUser)
 
-                if permittedUserSerializer.data['user'] != receiver_id:
+                if str(permittedUserSerializer.data['user']) != str(receiver_id):
                     return Response(status=status.HTTP_400_BAD_REQUEST)
 
                 historySerializer = HistorySerializer(data = {'child': permittedUserSerializer.data['child'], 'receiver': permittedUserSerializer.data['user'], 'teacher': request.user.id, 'decision': acceptance, 'date': timezone.now()})
