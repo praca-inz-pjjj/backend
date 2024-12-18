@@ -50,7 +50,7 @@ class Child(models.Model):
     
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=['first_name', 'last_name', 'birth_date'], name='unique_name_surname_birth_date')
+            models.UniqueConstraint(fields=['first_name', 'last_name', 'birth_date', 'classroom'], name='unique_name_surname_birth_date')
         ]
         verbose_name = "Child" # "Dziecko"
         verbose_name_plural = "Children" # "Dzieci"

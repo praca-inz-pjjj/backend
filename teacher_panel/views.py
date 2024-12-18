@@ -1,3 +1,4 @@
+from django.db import transaction
 from datetime import datetime, timedelta, timezone
 from secrets import randbelow
 from django.http import HttpRequest
@@ -56,18 +57,7 @@ def class_data(request: Request, id):
         "children": children,
         "class_name": classroom.name,
     })
-    
 
-# class LogoutView(APIView):
-#      permission_classes = (IsTeacher,)
-#      def post(self, request):
-#           try:
-#                refresh_token = request.data["refresh_token"]
-#                token = RefreshToken(refresh_token)
-#                token.blacklist()
-#                return Response(status=status.HTTP_205_RESET_CONTENT)
-#           except Exception as e:
-#                return Response(status=status.HTTP_400_BAD_REQUEST)
            
 @api_view(['POST'])
 @permission_classes([IsTeacher])
