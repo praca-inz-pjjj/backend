@@ -1,6 +1,7 @@
 from django.urls import path
 
 from parent_panel.other_views.create_receiver import CreateReceiver
+from parent_panel.other_views.receiverPermission import ReceiverPermission
 
 from . import views
 from .views import ObtainParentTokenPairView
@@ -28,5 +29,6 @@ urlpatterns = [
     path("child/<int:child_id>/create-receiver", CreateReceiver.as_view(), name="create_receiver"),
     path("receiver/<int:receiver_id>/signature", ReceiverSignatureView.as_view(), name="receiver_signature"),
     path("receiver/<int:receiver_id>", ReceiverView.as_view(), name="get_receiver_details"),
+    path("receiver/permission", ReceiverPermission.as_view(), name="receiver_permission"),
     path("history", ParentHistoryDataView.as_view(), name="get_parent_history"),
 ]
