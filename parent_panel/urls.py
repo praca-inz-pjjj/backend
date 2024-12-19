@@ -18,6 +18,7 @@ urlpatterns = [
     path("token", ObtainParentTokenPairView.as_view(), name="token_obtain_pair"),
     path("permissions", views.get_permissions, name="get_permissions"),
     path("generate/<int:id>", views.generate_QR_code, name="generate_QR_code"),
+    path("child/all", views.get_all_children, name="get_all_children"),
     path("child/<int:id>", get_child_details, name="get_child_details"),
     path("child/<int:child_id>/receivers", ChildReceiversView.as_view()),
     path("child/<int:id>/permitted-users", views.get_permitted_users_for_child, name="get_permitted_users_for_child"),

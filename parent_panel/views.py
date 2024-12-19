@@ -144,6 +144,7 @@ class ObtainParentTokenPairSerializer(TokenObtainPairSerializer):
         if(user.parent_perm < 1):
             raise ValidationError('Podany użytkownik nie jest rodzicem')
         token['temp_password'] = user.temp_password
+        token['type'] = user.parent_perm
         Log.objects.create(log_type=LogType.LOGIN, data={"panel": "parent", "email": user.email})
         return token
     def validate(self, attrs):
@@ -151,8 +152,24 @@ class ObtainParentTokenPairSerializer(TokenObtainPairSerializer):
 
         # Dodajemy informację do odpowiedzi, jeśli użytkownik ma tymczasowe hasło
         data['temp_password'] = self.user.temp_password
-        
+        data['type'] = self.user.parent_perm
         return data
     
 class ObtainParentTokenPairView(TokenObtainPairView):
     serializer_class = ObtainParentTokenPairSerializer
+
+
+@api_view(['GET'])
+@permission_classes([IsParent])
+def get_all_children(request):
+    parent = CustomUser.objects.get(id=request.user.id)
+    children = UserChild.objects.filter(user=parent)
+    children_data = []
+    for child in children:
+        children_data.append({
+            "id": child.child.id,
+            "name": child.child.get_full_name()
+        })
+    return Response({
+        "children": children_data
+    })
