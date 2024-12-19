@@ -7,6 +7,7 @@ from backbone.types import LogType
 from parent_panel.serializers import HistorySerializer
 from parent_panel.models import History, UserChild
 from backbone.permisions import IsParent, IsReceiver
+from django.db.models import Q
 
 class ParentHistoryDataView(APIView):
     permission_classes = (IsAuthenticated, )
@@ -28,7 +29,7 @@ class ParentHistoryDataView(APIView):
             parent_id = request.user.id
             parent_children_ids = UserChild.objects.filter(user_id=parent_id).values_list('child_id', flat=True)
             
-            history = History.objects.filter(child_id__in=parent_children_ids)
+            history = History.objects.filter(Q(child_id__in=parent_children_ids) | Q(receiver_id=parent_id))
             history_serializer = HistorySerializer(history, many=True)
 
         Log.objects.create(log_type=LogType.HISTORY, data={"fetcher_id": request.user.id})
