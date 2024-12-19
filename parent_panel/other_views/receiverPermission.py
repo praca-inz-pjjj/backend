@@ -27,7 +27,7 @@ class ReceiverPermission(APIView):
             child_id = request.data['child_id']
             userChild = UserChild.objects.filter(child_id = child_id, user_id = parent.id)
             if len(userChild) == 0:
-                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(status=status.HTTP_401_UNAUTHORIZED)
             permission = PermittedUser.objects.filter(child_id=child_id, user_id=receiver_id, parent_id=parent.id)
             if len(permission) > 0:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -35,7 +35,7 @@ class ReceiverPermission(APIView):
                 permittedUser = PermittedUser.objects.create(user_id=receiver_id, child_id=child_id, parent_id=parent.id)
                 permittedUser.save()
             except:
-                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response(status=status.HTTP_403_FORBIDDEN)
             return Response(status=status.HTTP_200_OK)
 
         except:
