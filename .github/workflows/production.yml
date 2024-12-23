@@ -2,20 +2,16 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-# bizapp-api
-name: Deploy to Production
+name: Publish to Production
 
 on:
-  # workflow_run:
-  #   workflows: [Deploy to Development]
-  #   branches: [main]
-  #   types:
-  #     - completed
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   build:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -68,6 +64,6 @@ jobs:
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: 'bizapp-api'
+          app-name: 'safekid'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_950A490AB7384724A4E7444BB3ADE9A9 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F6CDB29B0CB8448DA1C0E49DC19CAC5D }}
