@@ -21,17 +21,21 @@ class AcceptReceiptView(APIView):
     def get(self, request):
         try:
             id = request.GET.get('id')
-            permision = Permission.objects.get(qr_code = id)
+            byId = request.GET.get('byId')
+            if byId == '1':
+                permision = Permission.objects.get(id=id)
+            else:
+                permision = Permission.objects.get(qr_code = id)
         except:
             return Response(status=status.HTTP_404_NOT_FOUND)
         try:
             permisionSerializer = PermissionSerializer(permision)
-            if permisionSerializer['state'].value == 'ACTIVE' or permisionSerializer['state'].value == 'PERMANENT':
+            if permisionSerializer['state'].value == 'ACTIVE' or permisionSerializer['state'].value == 'PERMANENT' or byId == '1':
                 start_date = datetime.fromisoformat(permisionSerializer['start_date'].value)
                 end_date = datetime.fromisoformat(permisionSerializer['end_date'].value)
                 current = datetime.now(start_date.tzinfo)
                 
-                if (start_date < current and end_date > current):
+                if (start_date < current and end_date > current) or permisionSerializer['state'].value == 'PERMANENT':
                     parent = CustomUser.objects.get(id = permisionSerializer.data['parent'])
                     parentSerializer = CustomUserSerializer(parent)
                     
