@@ -1,27 +1,18 @@
 from secrets import randbelow
 from zoneinfo import ZoneInfo
 
-from django.shortcuts import render
-from django.http import HttpRequest
 from django.utils import timezone
 from django.conf import settings
-from django.forms.models import model_to_dict
-from rest_framework.request import Request
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from rest_framework_simplejwt.tokens import RefreshToken
 from backbone.permisions import IsReceiver, IsParent
 from backbone.models import CustomUser, Log
 from backbone.types import LogType
 from backend.utils.sendmail import sendmail
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework.exceptions import ValidationError
-from teacher_panel.serializers import ChildrenSerializer
 from .serializers import PermissionSerializer
 
 from .models import *
@@ -133,7 +124,10 @@ def delete_permission(request, perm_id):
     # check if permission child is connected to parent
     if not UserChild.objects.filter(user=request.user, child=permission.permitteduser.child).exists():
         return Response(status=status.HTTP_403_FORBIDDEN)
-    Log.objects.create(log_type=LogType.DELETE, data={"type" : "Permission", "permission" : model_to_dict(permission), "parent_id" : request.user.id})
+    Log.objects.create(
+        log_type=LogType.DELETE,
+        data={"type": "Permission", "permission": PermissionSerializer(permission).data, "parent_id": request.user.id}
+    )
     permission.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
