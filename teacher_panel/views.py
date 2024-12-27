@@ -1,17 +1,14 @@
-from django.db import transaction
-from datetime import datetime, timedelta, timezone
-from secrets import randbelow
-from django.http import HttpRequest
+from datetime import datetime
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
-from rest_framework_simplejwt.tokens import RefreshToken
 from backbone.models import CustomUser, Log
-from backbone.types import LogType, PermissionState
+from backbone.types import LogType
 from parent_panel.models import Permission, PermittedUser
+from teacher_panel.other_views.validators.child_validator import ChildValidator
+from teacher_panel.other_views.common_error_messages import NOT_CHILD_TEACHER_MESSAGE
 from .serializers import ClassroomSerializer, ChildrenSerializer
 from .models import *
 from backbone.permisions import IsTeacher, IsIssuer
@@ -113,6 +110,24 @@ def check_two_factor_code(request):
         except:
             return Response(data={'correct': False})
 
+@api_view(['PATCH'])
+@permission_classes([IsTeacher])
+def update_receiver_signature(request: Request, child_id: int, receiver_id: int) -> Response:
+    try:
+        teacher: CustomUser = request.user
+        value: bool = request.data['value']
+
+        child: Child = get_object_or_404(Child, id=child_id)
+
+        if not ChildValidator.is_teacher_of_child(teacher, child):
+            return Response({"message": NOT_CHILD_TEACHER_MESSAGE}, status.HTTP_403_FORBIDDEN)
+        
+        receiver: PermittedUser = get_object_or_404(PermittedUser, user_id=receiver_id, child_id=child_id)
+        receiver.signature_delivered = value
+        receiver.save()
+        return Response(status=status.HTTP_200_OK)
+    except:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class ObtainTeacherTokenPairSerializer(TokenObtainPairSerializer):
     @classmethod
