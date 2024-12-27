@@ -11,7 +11,6 @@ from .other_views.child_details import get_child_details
 from .other_views.parent_receivers import ParentReceiversView
 from .other_views.receiver import ReceiverView
 from parent_panel.other_views.parent_children import ParentChildrenView
-from .other_views.receiver_signature import ReceiverSignatureView
 from .other_views.history import ParentHistoryDataView
 from .other_views.authorization_letter import authorization_letter
 
@@ -29,7 +28,6 @@ urlpatterns = [
     path("receivers", ParentReceiversView.as_view(), name="get_parent_receivers"),
     path("children", ParentChildrenView.as_view(), name="get_parent_children"),
     path("child/<int:child_id>/create-receiver", CreateReceiver.as_view(), name="create_receiver"),
-    path("receiver/<int:receiver_id>/signature", ReceiverSignatureView.as_view(), name="receiver_signature"),
     path("receiver/<int:receiver_id>", ReceiverView.as_view(), name="get_receiver_details"),
     path("receiver/permission", ReceiverPermission.as_view(), name="receiver_permission"),
     path("history", ParentHistoryDataView.as_view(), name="get_parent_history"),
