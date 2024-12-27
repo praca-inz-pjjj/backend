@@ -1,0 +1,1 @@
+NOT_CHILD_TEACHER_MESSAGE = "Nie jesteś nauczycielem tego dziecka."

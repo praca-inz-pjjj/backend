@@ -1,16 +1,16 @@
 from django.urls import path
 
-from teacher_panel.use_cases.downloadParentList import DownloadParentList
-from teacher_panel.use_cases.getChildrenOfReceiver import GetChildrenOfReceiverView
-from teacher_panel.use_cases.getReceivers import GetReceiversView
+from teacher_panel.other_views.download_parent_list import DownloadParentList
+from teacher_panel.other_views.get_children_of_receiver import GetChildrenOfReceiverView
+from teacher_panel.other_views.get_receivers import GetReceiversView
 
 
-from .use_cases.acceptReceipt import AcceptReceiptView
+from .other_views.accept_receipt import AcceptReceiptView
 from . import views
-from .use_cases.childParents import ChildParentsView
+from .other_views.child_parents import ChildParentsView
 from .views import ObtainTeacherTokenPairView
-from .use_cases.createParent import CreateParent
-from .use_cases.createChildren import create_children
+from .other_views.create_parent import CreateParent
+from .other_views.create_children import create_children
 
 urlpatterns = [
     path("", views.teacher_data),
@@ -26,5 +26,6 @@ urlpatterns = [
     path('create-parent', CreateParent.as_view()),
     path('class/<int:id>/download', DownloadParentList.as_view()),
     path('receivers', GetReceiversView.as_view()),
-    path('children/<int:id>', GetChildrenOfReceiverView.as_view())
+    path('children/<int:id>', GetChildrenOfReceiverView.as_view()),
+    path('child/<int:child_id>/receiver/<int:receiver_id>/signature-delivery', views.update_receiver_signature, name='update_receiver_signature'),
 ]
