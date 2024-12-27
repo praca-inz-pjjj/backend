@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from backbone.models import CustomUser
 from backbone.permisions import IsParent
 from parent_panel.models import PermittedUser
-from parent_panel.other_views.commons import NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE
+from parent_panel.other_views.common_error_messages import NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE
 from parent_panel.other_views.validators.child_validator import ChildValidator
 from teacher_panel.models import Child
 
