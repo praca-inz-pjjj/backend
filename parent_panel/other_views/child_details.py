@@ -44,6 +44,7 @@ def get_child_details(request: Request, id: int):
         if (permission.end_date < timezone.now() and permission.state != PermissionState.PERMANENT and permission.state != PermissionState.CLOSED):
             permission.state = PermissionState.CLOSED
             permission.save()
+        if permission.state in (PermissionState.CLOSED, PermissionState.PERMANENT):
             continue
         permission_data = {
             "permission_id": permission.id,
