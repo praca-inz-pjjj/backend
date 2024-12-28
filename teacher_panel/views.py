@@ -126,7 +126,7 @@ def update_receiver_signature(request: Request, child_id: int, receiver_id: int)
         child: Child = get_object_or_404(Child, id=child_id)
 
         if not ChildValidator.is_teacher_of_child(teacher, child):
-            return Response({"message": NOT_CHILD_TEACHER_MESSAGE}, status.HTTP_403_FORBIDDEN)
+            return Response({"error": NOT_CHILD_TEACHER_MESSAGE}, status.HTTP_403_FORBIDDEN)
         
         receiver: PermittedUser = get_object_or_404(PermittedUser, user_id=receiver_id, child_id=child_id)
         receiver.signature_delivered = value
