@@ -1,4 +1,5 @@
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from rest_framework.request import Request
 from backbone.models import CustomUser, Log
 from backbone.permisions import IsTeacher
@@ -18,14 +19,11 @@ from django.db import transaction
 class ChildParentsView(APIView):
     permission_classes = [IsTeacher]
     def get(self, request: Request, id: int):
+        child = get_object_or_404(Child, id=id)
+        if not ChildValidator.is_teacher_of_child(request.user, child):
+            return Response({"error": NOT_CHILD_TEACHER_MESSAGE},status=status.HTTP_403_FORBIDDEN)
+        
         try:
-            child = Child.objects.get(id=id)
-            if not ChildValidator.is_teacher_of_child(request.user, child):
-                return Response(
-                    {"error": NOT_CHILD_TEACHER_MESSAGE},
-                    status=status.HTTP_403_FORBIDDEN,
-                )
-
             allParents = CustomUser.objects.filter(parent_perm=2)
             childParents = CustomUser.objects.filter(userchild__child_id=id)
             childClassroom = Classroom.objects.get(id=child.classroom_id)
@@ -56,14 +54,11 @@ class ChildParentsView(APIView):
 
     @transaction.atomic
     def delete(self, request: Request, id: int):
+        child = get_object_or_404(Child, id=id)
+        if not ChildValidator.is_teacher_of_child(request.user, child):
+            return Response({"error": NOT_CHILD_TEACHER_MESSAGE},status=status.HTTP_403_FORBIDDEN)
+        
         try:
-            child = Child.objects.get(id=id)
-            if not ChildValidator.is_teacher_of_child(request.user, child):
-                return Response(
-                    {"error": NOT_CHILD_TEACHER_MESSAGE},
-                    status=status.HTTP_403_FORBIDDEN,
-                )
-
             parent_id = request.data.get('id')
             with transaction.atomic():
                 item = UserChild.objects.get(child=id, user=parent_id)
@@ -81,9 +76,7 @@ class ChildParentsView(APIView):
                         "teacher_id": request.user.id
                     }
                 )
-
             return Response(status=status.HTTP_204_NO_CONTENT)
-
         except UserChild.DoesNotExist:
             return Response({'error': 'UserChild not found.'}, status=status.HTTP_404_NOT_FOUND)
         except PermittedUser.DoesNotExist:
@@ -93,48 +86,42 @@ class ChildParentsView(APIView):
 
     @transaction.atomic
     def post(self, request: Request, id: int):
-        try:
-            child = Child.objects.get(id=id)
+            child = get_object_or_404(Child, id=id)
             if not ChildValidator.is_teacher_of_child(request.user, child):
-                return Response(
-                    {"error": NOT_CHILD_TEACHER_MESSAGE},
-                    status=status.HTTP_403_FORBIDDEN,
-                )
+                return Response({"error": NOT_CHILD_TEACHER_MESSAGE},status=status.HTTP_403_FORBIDDEN)
             
-            parent_id = request.data.get('id')
-            with transaction.atomic():
-                userChildrenSerializer = UserChildrenSerializer(data={'child': id, 'user': parent_id})
-                if not userChildrenSerializer.is_valid():
-                    return Response({'error': userChildrenSerializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-                userChildrenSerializer.save()
+            try:
+                parent_id = request.data.get('id')
+                with transaction.atomic():
+                    userChildrenSerializer = UserChildrenSerializer(data={'child': id, 'user': parent_id})
+                    if not userChildrenSerializer.is_valid():
+                        return Response({'error': userChildrenSerializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+                    userChildrenSerializer.save()
 
-                permittedUserSerializer = PermittedUserSerializer(data={'child': id, 'parent': parent_id, 'user': parent_id})
-                if not permittedUserSerializer.is_valid():
-                    return Response({'error': permittedUserSerializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-                saved_permittedUser = permittedUserSerializer.save()
+                    permittedUserSerializer = PermittedUserSerializer(data={'child': id, 'parent': parent_id, 'user': parent_id})
+                    if not permittedUserSerializer.is_valid():
+                        return Response({'error': permittedUserSerializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+                    saved_permittedUser = permittedUserSerializer.save()
 
-                permissionSerializer = PermissionSerializer(data={
-                    'permitteduser': saved_permittedUser.id,
-                    'state': PermissionState.PERMANENT,
-                    'parent': parent_id,
-                    'end_date': timezone.now()
-                })
-                if not permissionSerializer.is_valid():
-                    return Response({'error': permissionSerializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-                permissionSerializer.save()
+                    permissionSerializer = PermissionSerializer(data={
+                        'permitteduser': saved_permittedUser.id,
+                        'state': PermissionState.PERMANENT,
+                        'parent': parent_id,
+                        'end_date': timezone.now()
+                    })
+                    if not permissionSerializer.is_valid():
+                        return Response({'error': permissionSerializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+                    permissionSerializer.save()
 
-                Log.objects.create(
-                    log_type=LogType.CREATE,
-                    data={
-                        "type": "UserChild",
-                        "child_id": id,
-                        "parent_id": parent_id,
-                        "teacher_id": request.user.id
-                    }
-                )
-
-            return Response(userChildrenSerializer.data, status=status.HTTP_201_CREATED)
-
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+                    Log.objects.create(
+                        log_type=LogType.CREATE,
+                        data={
+                            "type": "UserChild",
+                            "child_id": id,
+                            "parent_id": parent_id,
+                            "teacher_id": request.user.id
+                        }
+                    )
+                    return Response(userChildrenSerializer.data, status=status.HTTP_201_CREATED)
+            except Exception as e:
+                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

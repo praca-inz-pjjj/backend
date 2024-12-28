@@ -1,4 +1,5 @@
 from datetime import datetime
+from django import shortcuts
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.request import Request
@@ -8,7 +9,8 @@ from backbone.models import CustomUser, Log
 from backbone.types import LogType
 from parent_panel.models import Permission, PermittedUser
 from teacher_panel.other_views.validators.child_validator import ChildValidator
-from teacher_panel.other_views.common_error_messages import NOT_CHILD_TEACHER_MESSAGE
+from teacher_panel.other_views.common_error_messages import NOT_CHILD_TEACHER_MESSAGE, NOT_CLASSROOM_TEACHER_MESSAGE
+from teacher_panel.other_views.validators.classroom_validator import ClassroomValidator
 from .serializers import ClassroomSerializer, ChildrenSerializer
 from .models import *
 from backbone.permisions import IsTeacher, IsIssuer
@@ -39,7 +41,12 @@ def teacher_data(request):
 
 @api_view(['GET'])
 @permission_classes([IsTeacher])
-def class_data(request: Request, id):
+def class_data(request: Request, id: int) -> Response:
+    teacher = CustomUser.objects.get(id=request.user.id)
+    classroom = shortcuts.get_object_or_404(Classroom,id=id)
+    if not ClassroomValidator.is_teacher_of_classroom(teacher, classroom):
+        return Response({"error": NOT_CLASSROOM_TEACHER_MESSAGE}, status=status.HTTP_403_FORBIDDEN)
+
     children = [
         {
             'id': child.id,
@@ -48,7 +55,6 @@ def class_data(request: Request, id):
             'birth_date': child.birth_date,
         } for child in Child.objects.filter(classroom_id=id)
     ]
-    classroom = Classroom.objects.get(id=id)
     return Response({
         "id": id,
         "children": children,
