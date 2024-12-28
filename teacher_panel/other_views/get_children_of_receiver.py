@@ -1,4 +1,5 @@
 from pyclbr import Class
+from urllib.request import Request
 from django.utils import timezone
 from backbone.models import CustomUser, Log
 from backbone.permisions import IsTeacher
@@ -15,7 +16,7 @@ from django.utils.timezone import now
 
 class GetChildrenOfReceiverView(APIView):
     permission_classes = [IsTeacher]
-    def get(self, request, id):
+    def get(self, request: Request, id) -> Response:
         try:
             permittedusers = PermittedUser.objects.filter(user_id=id)
             permissions = Permission.objects.filter(

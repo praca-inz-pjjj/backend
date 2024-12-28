@@ -12,7 +12,7 @@ from django.utils import timezone
 from zoneinfo import ZoneInfo
 from django.conf import settings
 
-from parent_panel.other_views.commons import NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE
+from parent_panel.other_views.common_error_messages import NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE
 from parent_panel.other_views.validators.child_validator import ChildValidator
 
 @api_view(['GET'])

@@ -12,7 +12,7 @@ from rest_framework import status
 
 from backbone.types import LogType
 from parent_panel.models import PermittedUser
-from parent_panel.other_views.commons import EMAIL_IS_ALREADY_TAKEN_MESSAGE, NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE, PHONE_IS_ALREADY_TAKEN_MESSAGE
+from parent_panel.other_views.common_error_messages import EMAIL_IS_ALREADY_TAKEN_MESSAGE, NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE, PHONE_IS_ALREADY_TAKEN_MESSAGE
 from parent_panel.other_views.validators.child_validator import ChildValidator
 from parent_panel.other_views.validators.user_validator import UserValidator
 from teacher_panel.models import Child

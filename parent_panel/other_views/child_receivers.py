@@ -7,7 +7,7 @@ from django.forms.models import model_to_dict
 from backbone.permisions import IsParent
 from backbone.models import CustomUser, Log
 from backbone.types import LogType
-from parent_panel.other_views.commons import NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE, USER_ALREADY_PERMITTED_MESSAGE
+from parent_panel.other_views.common_error_messages import NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE, USER_ALREADY_PERMITTED_MESSAGE
 from .validators.child_validator import ChildValidator
 from ..serializers import PermittedUserSerializer
 from ..models import Child, PermittedUser
