@@ -30,14 +30,14 @@ class CreateReceiver(APIView):
             password = data.get('password')
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
         child: Child = get_object_or_404(Child, id=child_id)
+
         if not ChildValidator.is_parent_of_child(parent, child):
             return Response({"message": NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE}, status.HTTP_403_FORBIDDEN)
 
         if UserValidator.is_email_taken(email):
             return Response({"message": EMAIL_IS_ALREADY_TAKEN_MESSAGE}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         if UserValidator.is_phone_taken(phone):
             return Response({"message": PHONE_IS_ALREADY_TAKEN_MESSAGE}, status=status.HTTP_400_BAD_REQUEST)
 
