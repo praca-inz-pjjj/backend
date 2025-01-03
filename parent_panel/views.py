@@ -111,8 +111,6 @@ def create_permission(request, id):
                                             "end_date": request.data['end_date']})
     except:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    print("OK")
-    print(serializer.error_messages)
     if serializer.is_valid():
         permission = serializer.save()
         if request.data['two_factor_verification']:
