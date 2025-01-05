@@ -30,7 +30,7 @@ class ParentReceiversView(APIView):
                 "child_name": get_object_or_404(Child.objects, id=receiver.child.id).get_full_name(),
                 "child_id": get_object_or_404(Child.objects, id=receiver.child.id).id,
                 "parent_name": receiver.parent.get_full_name(),
-                "date": timezone.localtime(receiver.date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d"),
+                "date": timezone.localtime(receiver.date, ZoneInfo(settings.TIME_ZONE)).strftime("%d.%m.%Y"),
                 "signature": receiver.signature_delivered,
                 "is_parent": UserChild.objects.filter(user=receiver.user, child_id__in=parent_children_ids).exists(),
             } for receiver in receivers

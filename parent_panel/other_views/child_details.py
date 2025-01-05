@@ -14,6 +14,7 @@ from django.conf import settings
 
 from parent_panel.other_views.common_error_messages import NO_ACCESS_TO_CHILD_RESPONSE_MESSAGE
 from parent_panel.other_views.validators.child_validator import ChildValidator
+from teacher_panel.models import UserClassroom
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated, IsParent])
@@ -31,7 +32,7 @@ def get_child_details(request: Request, id: int):
             "user_id": permitted_user.user.id,
             "user_name": permitted_user.user.get_full_name(),
             "parent_name": permitted_user.parent.get_full_name(),
-            "date": timezone.localtime(permitted_user.date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d"),
+            "date": timezone.localtime(permitted_user.date, ZoneInfo(settings.TIME_ZONE)).strftime("%d.%m.%Y"),
             "signature": permitted_user.signature_delivered,
             "is_parent": UserChild.objects.filter(user=permitted_user.user, child=child).exists(),
         }
@@ -39,7 +40,7 @@ def get_child_details(request: Request, id: int):
 
     permissions_data = []
     permitted_users_ids = permitted_users.values_list('id', flat=True)
-    permissions = Permission.objects.filter(permitteduser__in=permitted_users_ids)
+    permissions = Permission.objects.filter(permitteduser__in=permitted_users_ids).order_by('start_date')
     for permission in permissions:
         if (permission.end_date < timezone.now() and permission.state != PermissionState.PERMANENT and permission.state != PermissionState.CLOSED):
             permission.state = PermissionState.CLOSED
@@ -50,14 +51,17 @@ def get_child_details(request: Request, id: int):
             "permission_id": permission.id,
             "user_name": permission.permitteduser.user.get_full_name(),
             "state": permission.state,
-            "start_date": timezone.localtime(permission.start_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S"),
-            "end_date": timezone.localtime(permission.end_date, ZoneInfo(settings.TIME_ZONE)).strftime("%Y-%m-%d %H:%M:%S"),
+            "start_date": timezone.localtime(permission.start_date, ZoneInfo(settings.TIME_ZONE)).strftime("%d.%m.%Y, %H:%M:%S"),
+            "end_date": timezone.localtime(permission.end_date, ZoneInfo(settings.TIME_ZONE)).strftime("%d.%m.%Y, %H:%M:%S"),
         }
         permissions_data.append(permission_data)
 
+    teacher_name = UserClassroom.objects.get(classroom=child.classroom).user.get_full_name()
     return Response({
         "child_id": child.id, 
         "child_name": child.get_full_name(),
+        "child_classroom": child.classroom.name,
+        "child_teacher": teacher_name,
         "permitted_users": permitted_users_data,
         "permissions": permissions_data
     })
